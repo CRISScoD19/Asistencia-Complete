@@ -1,0 +1,3 @@
+.root { -fx-font-family: 'Segoe UI', Arial; -fx-padding: 8px; }
+Label { -fx-font-size: 13px; }
+Button { -fx-cursor: hand; }

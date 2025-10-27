@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER" prefHeight="550" prefWidth="700" spacing="8" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pe.edu.upeu.asistencia.controller.EmpleadoController">
+    <padding>
+        <Insets bottom="12" left="12" right="12" top="12" />
+    </padding>
+    <Label style="-fx-font-size:14px; -fx-font-weight:bold;" text="Panel Empleado" />
+    <Label fx:id="lblNombre" text="Empleado: " />
+    <Label fx:id="lblHorario" text="Horario: " />
+
+    <Separator />
+    <Label text="Registrar Entrada/Salida" />
+    <Button fx:id="btnEntradaSalida" onAction="#registrarEntradaSalida" text="Registrar Entrada/Salida" />
+
+    <Separator />
+    <Label text="Solicitar Vacaciones" />
+    <HBox spacing="8">
+        <Label text="Inicio:" /><DatePicker fx:id="dpInicio" />
+        <Label text="Fin:" /><DatePicker fx:id="dpFin" />
+        <Button onAction="#solicitarVacacion" text="Solicitar" />
+    </HBox>
+
+    <Separator />
+    <Label text="Mis solicitudes:" />
+    <TableView fx:id="tablaVac" prefHeight="140">
+        <columns>
+            <TableColumn fx:id="colInicio" prefWidth="146.99996662139893" text="Inicio" />
+            <TableColumn fx:id="colFin" prefWidth="180.2000274658203" text="Fin" />
+            <TableColumn fx:id="colEstado" prefWidth="287.79998779296875" text="Estado" />
+        </columns>
+    </TableView>
+
+    <Separator />
+    <Label text="Mi historial de asistencia:" />
+    <TableView fx:id="tablaAsist" prefHeight="140">
+        <columns>
+            <TableColumn fx:id="colFechaEntrada" prefWidth="134.99999713897705" text="Entrada" />
+            <TableColumn fx:id="colFechaSalida" prefWidth="160.6000518798828" text="Salida" />
+        </columns>
+    </TableView>
+
+    <Button onAction="#volverLogin" text="Volver al Login" />
+</VBox>

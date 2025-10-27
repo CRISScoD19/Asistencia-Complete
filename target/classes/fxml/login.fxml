@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="260" prefWidth="420" spacing="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="pe.edu.upeu.asistencia.controller.LoginController">
+    <padding>
+        <Insets bottom="16" left="16" right="16" top="16" />
+    </padding>
+    <Label style="-fx-font-size:16px; -fx-font-weight:bold;" text="Sistema de Asistencia" />
+    <TextField fx:id="usernameField" prefHeight="26.0" prefWidth="297.0" promptText="Usuario" />
+    <PasswordField fx:id="passwordField" promptText="Contraseña" />
+    <Button onAction="#login" text="Ingresar" />
+    <Label fx:id="lblError" textFill="red" />
+</VBox>
