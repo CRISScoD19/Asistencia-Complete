@@ -4,30 +4,46 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class App extends Application {
-    private static Stage stage;
+
+    private static Stage primaryStage;
+    private ConfigurableApplicationContext springContext;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        stage = primaryStage;
+    public void init() {
+        springContext = AsistenciaApplication.getSpringContext();
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        primaryStage = stage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+        loader.setControllerFactory(AsistenciaApplication.getSpringContext()::getBean);
+        // 🔹 Spring inyecta controladores
+
         Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(getClass().getResource("/css/styles.css").toExternalForm());
-        stage.setScene(scene);
         stage.setTitle("Sistema de Asistencia");
-        stage.show();
-    }
-
-    public static void changeScene(String fxml) throws Exception {
-        FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml));
-        Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(App.class.getResource("/css/styles.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }
 
-    public static void main(String[] args) {
-        launch();
+    @Override
+    public void stop() {
+        springContext.close();
+    }
+
+    // ✅ Método para cambiar de ventana
+    public static void setRoot(String fxml) throws Exception {
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("/fxml/" + fxml));
+        loader.setControllerFactory(AsistenciaApplication.getSpringContext()::getBean);
+        Scene scene = new Scene(loader.load());
+        getPrimaryStage().setScene(scene);
+    }
+
+    // ✅ Aquí definimos el getter que te faltaba
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

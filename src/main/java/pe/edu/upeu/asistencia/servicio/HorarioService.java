@@ -1,25 +1,21 @@
 package pe.edu.upeu.asistencia.servicio;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pe.edu.upeu.asistencia.modelo.Horario;
-import pe.edu.upeu.asistencia.modelo.Usuario;
 import pe.edu.upeu.asistencia.repositorio.HorarioRepository;
-import java.time.LocalTime;
+
+import java.util.List;
 import java.util.Optional;
 
+@Service
 public class HorarioService {
-    private final HorarioRepository repo = HorarioRepository.getInstance();
 
-    public HorarioService() {}
+    @Autowired
+    private HorarioRepository repo;
 
-    public Horario getOrCreateDefaultHorario(Usuario u) {
-        Optional<Horario> opt = repo.findByEmpleado(u);
-        if (opt.isPresent()) return opt.get();
-        Horario h = new Horario(null, u, LocalTime.of(9,0), LocalTime.of(18,0), "LUN-MAR-MIE-JUE-VIE");
-        return repo.save(h);
-    }
-
-    public Horario asignarHorario(Usuario u, LocalTime inicio, LocalTime fin, String dias) {
-        Horario h = new Horario(null, u, inicio, fin, dias);
-        return repo.save(h);
-    }
+    public Horario save(Horario h) { return repo.save(h); }
+    public List<Horario> listar() { return repo.findAll(); }
+    public Optional<Horario> findById(Long id) { return repo.findById(id); }
+    public void delete(Long id) { repo.deleteById(id); }
 }

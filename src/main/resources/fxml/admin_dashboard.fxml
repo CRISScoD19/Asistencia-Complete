@@ -1,59 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<VBox alignment="TOP_CENTER" prefHeight="600" prefWidth="800" spacing="8" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="pe.edu.upeu.asistencia.controller.AdminController">
-    <padding>
-        <Insets bottom="12" left="12" right="12" top="12" />
-    </padding>
-    <Label style="-fx-font-size:14px; -fx-font-weight:bold;" text="Panel Admin - Gestión de Usuarios, Horarios y Vacaciones" />
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="pe.edu.upeu.asistencia.controller.AdminController"
+            prefWidth="800" prefHeight="600">
 
-    <HBox spacing="10">
-        <VBox spacing="6">
-            <Label text="Registrar nuevo empleado:" />
-            <TextField fx:id="nombreField" promptText="Nombre completo" />
-            <TextField fx:id="usuarioField" promptText="Usuario" />
-            <PasswordField fx:id="passField" promptText="Contraseña" />
-            <Button onAction="#registrarEmpleado" text="Registrar empleado" />
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #1976D2;">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Panel del Administrador" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Cerrar Sesión" onAction="#cerrarSesion" style="-fx-background-color: #E53935; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" alignment="CENTER">
+            <Button text="Registrar Usuario" onAction="#registrarUsuario" prefWidth="250"/>
+            <Button text="Ver Empleados" onAction="#verEmpleados" prefWidth="250"/>
+            <Button text="Ver Asistencias" onAction="#verAsistencias" prefWidth="250"/>
+            <Button text="Enviar Mensaje" onAction="#enviarMensaje" prefWidth="250"/>
+            <Button text="Bandeja de Entrada" onAction="#bandeja" prefWidth="250"/>
         </VBox>
-
-        <VBox prefWidth="450" spacing="6">
-            <Label text="Empleados registrados:" />
-            <TableView fx:id="tablaUsuarios" prefHeight="200">
-                <columns>
-                    <TableColumn fx:id="colNombre" prefWidth="122.99998474121094" text="Nombre" />
-                    <TableColumn fx:id="colUsuario" prefWidth="118.5999755859375" text="Usuario" />
-                    <TableColumn fx:id="colRol" prefWidth="156.800048828125" text="Rol" />
-                </columns>
-            </TableView>
-
-            <Label text="Asignar horario al empleado seleccionado (HH:MM):" />
-            <HBox spacing="6">
-                <TextField fx:id="horarioInicioField" promptText="09:00" />
-                <TextField fx:id="horarioFinField" promptText="18:00" />
-                <TextField fx:id="diasField" promptText="LUN-MAR-..." />
-                <Button onAction="#asignarHorario" text="Asignar Horario" />
-            </HBox>
-        </VBox>
-    </HBox>
-
-    <Separator />
-
-    <Label text="Bandeja de Vacaciones pendientes:" />
-    <TableView fx:id="tablaVacPendientes" prefHeight="180">
-        <columns>
-            <TableColumn fx:id="colEmp" text="Empleado" />
-            <TableColumn fx:id="colInicio" text="Inicio" />
-            <TableColumn fx:id="colFin" text="Fin" />
-            <TableColumn fx:id="colEstado" text="Estado" />
-        </columns>
-    </TableView>
-
-    <HBox spacing="8">
-        <Button onAction="#aceptarVacacion" text="Aceptar solicitud" />
-        <Button onAction="#rechazarVacacion" text="Rechazar solicitud" />
-        <Button onAction="#volverLogin" text="Volver al Login" />
-    </HBox>
-</VBox>
+    </center>
+</BorderPane>

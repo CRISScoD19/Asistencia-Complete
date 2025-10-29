@@ -1,35 +1,48 @@
 package pe.edu.upeu.asistencia.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import pe.edu.upeu.asistencia.App;
+import javafx.scene.control.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import pe.edu.upeu.asistencia.modelo.Usuario;
 import pe.edu.upeu.asistencia.servicio.UsuarioService;
-import pe.edu.upeu.asistencia.util.Session;
+import pe.edu.upeu.asistencia.util.SessionManager;
+import pe.edu.upeu.asistencia.util.SceneManager;
 
+import java.util.Optional;
+
+@Controller
 public class LoginController {
+
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label lblError;
-    private final UsuarioService usuarioService = new UsuarioService();
+
+    @Autowired private UsuarioService usuarioService;
 
     @FXML
-    public void initialize(){ lblError.setText(""); }
+    private void login(ActionEvent event) {
+        String u = usernameField.getText().trim();
+        String p = passwordField.getText().trim();
 
-    @FXML private void login() {
-        String u = usernameField.getText();
-        String p = passwordField.getText();
-        var op = usuarioService.authenticate(u,p);
-        if (op.isPresent()) {
-            Usuario user = op.get();
-            Session.setCurrentUser(user);
-            try {
-                if (user.getRol()!=null && user.getRol().toString().equals("ADMIN")) App.changeScene("admin_dashboard.fxml"); else App.changeScene("empleado_dashboard.fxml");
-            } catch (Exception e) { e.printStackTrace(); lblError.setText("Error al cargar la vista"); }
-        } else {
-            lblError.setText("Credenciales inválidas");
+        if (u.isEmpty()) { lblError.setText("Ingrese usuario"); usernameField.requestFocus(); return; }
+        if (p.isEmpty()) { lblError.setText("Ingrese contraseña"); passwordField.requestFocus(); return; }
+
+        Optional<Usuario> opt = usuarioService.authenticate(u, p);
+        if (opt.isEmpty()) { lblError.setText("Usuario o contraseña incorrectos"); return; }
+
+        Usuario usuario = opt.get();
+        SessionManager.setUsuarioActual(usuario);
+        try {
+            if (usuario.getRol() != null && usuario.getRol().name().equals("ADMIN")) {
+                SceneManager.changeScene("admin_dashboard.fxml", "Panel Admin");
+            } else {
+                SceneManager.changeScene("empleado_dashboard.fxml", "Panel Empleado");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblError.setText("Error al abrir pantalla");
         }
     }
 }

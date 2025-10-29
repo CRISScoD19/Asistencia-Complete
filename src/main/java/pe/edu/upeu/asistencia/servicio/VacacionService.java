@@ -1,17 +1,21 @@
 package pe.edu.upeu.asistencia.servicio;
 
-import pe.edu.upeu.asistencia.enums.VacacionEstado;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pe.edu.upeu.asistencia.modelo.Vacacion;
 import pe.edu.upeu.asistencia.repositorio.VacacionRepository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class VacacionService {
-    private final VacacionRepository repo = VacacionRepository.getInstance();
-    public Vacacion solicitar(Vacacion v) { v.setEstado(VacacionEstado.PENDIENTE); return repo.save(v); }
-    public List<Vacacion> listarPorEmpleado(Long id) { return repo.findByEmpleadoId(id); }
-    public List<Vacacion> listarPendientes() { return repo.findPendientes(); }
-    public Optional<Vacacion> obtener(Long id) { return repo.findById(id); }
-    public Vacacion actualizarEstado(Long id, VacacionEstado estado) { var op = repo.findById(id); if(op.isPresent()){ var v = op.get(); v.setEstado(estado); repo.save(v); return v; } return null; }
+
+    @Autowired
+    private VacacionRepository repo;
+
+    public Vacacion save(Vacacion v) { return repo.save(v); }
+    public List<Vacacion> listar() { return repo.findAll(); }
+    public Optional<Vacacion> findById(Long id) { return repo.findById(id); }
+    public void delete(Long id) { repo.deleteById(id); }
 }

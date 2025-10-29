@@ -1,43 +1,28 @@
 package pe.edu.upeu.asistencia.modelo;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "asistencias")
 public class Asistencia {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
     private Usuario empleado;
-    private LocalDateTime entrada;
-    private LocalDateTime salida;
+
+    @Column(name = "fecha_hora")
+    private LocalDateTime fechaHora;
 
     public Asistencia() {}
 
-    public Asistencia(Long id, Usuario empleado, LocalDateTime entrada, LocalDateTime salida) {
-        this.id = id;
-        this.empleado = empleado;
-        this.entrada = entrada;
-        this.salida = salida;
-    }
-
-    public Long getId() {
-        return id;
-    } public void setId(Long id) {
-        this.id = id;
-    }
-    public Usuario getEmpleado() {
-        return empleado;
-    }
-    public void setEmpleado(Usuario empleado) {
-        this.empleado = empleado;
-    }
-    public LocalDateTime getEntrada() {
-        return entrada;
-    }
-    public void setEntrada(LocalDateTime entrada) {
-        this.entrada = entrada;
-    }
-    public LocalDateTime getSalida() {
-        return salida;
-    }
-    public void setSalida(LocalDateTime salida) {
-        this.salida = salida;
-    }
+    public Long getId() { return id; }
+    public void setId(Long v) { id = v; }
+    public Usuario getEmpleado() { return empleado; }
+    public void setEmpleado(Usuario v) { empleado = v; }
+    public LocalDateTime getFechaHora() { return fechaHora; }
+    public void setFechaHora(LocalDateTime v) { fechaHora = v; }
 }
