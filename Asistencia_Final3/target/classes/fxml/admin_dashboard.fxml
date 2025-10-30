@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pe.edu.upeu.asistencia.controller.AdminDashboardController"
+            style="-fx-background-color: #f7fafc;">
+
+    <!-- Header -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #667eea; -fx-padding: 15;">
+            <Label text="👨‍💼 Panel de Administración" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🚪 Cerrar Sesión" onAction="#handleCerrarSesion"
+                    style="-fx-background-color: white; -fx-text-fill: #667eea; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <!-- Content -->
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: white;">
+
+            <!-- TAB USUARIOS -->
+            <Tab text="👥 Usuarios">
+                <VBox spacing="10" style="-fx-padding: 15;">
+
+                    <!-- Toolbar -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="btnNuevoUsuario" text="➕ Nuevo Usuario" onAction="#handleNuevoUsuario"
+                                style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                        <Button fx:id="btnEditarUsuario" text="✏️ Editar" onAction="#handleEditarUsuario"
+                                style="-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                        <Button fx:id="btnEliminarUsuario" text="🗑️ Eliminar" onAction="#handleEliminarUsuario"
+                                style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                    </HBox>
+
+                    <!-- Tabla -->
+                    <TableView fx:id="tblUsuarios" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colNombre" text="Nombre Completo" prefWidth="200"/>
+                            <TableColumn fx:id="colUsername" text="Usuario" prefWidth="150"/>
+                            <TableColumn fx:id="colRol" text="Rol" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- TAB ASISTENCIAS -->
+            <Tab text="📅 Asistencias">
+                <VBox spacing="10" style="-fx-padding: 15;">
+
+                    <!-- Toolbar -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="btnRegistrarAsistencia" text="➕ Registrar Asistencia" onAction="#handleRegistrarAsistencia"
+                                style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                        <Button fx:id="btnEliminarAsistencia" text="🗑️ Eliminar" onAction="#handleEliminarAsistencia"
+                                style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                    </HBox>
+
+                    <!-- Tabla -->
+                    <TableView fx:id="tblAsistencias" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colAsistenciaId" text="ID" prefWidth="50"/>
+                            <TableColumn fx:id="colEmpleado" text="Empleado" prefWidth="180"/>
+                            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="120"/>
+                            <TableColumn fx:id="colHoraEntrada" text="Hora Entrada" prefWidth="100"/>
+                            <TableColumn fx:id="colHoraSalida" text="Hora Salida" prefWidth="100"/>
+                            <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- TAB MENSAJES -->
+            <Tab text="✉️ Mensajes">
+                <BorderPane>
+                    <top>
+                        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15;">
+                            <Button fx:id="btnNuevoMensaje" text="➕ Nuevo Mensaje" onAction="#handleNuevoMensaje"
+                                    style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                            <Button fx:id="btnEliminarMensaje" text="🗑️ Eliminar" onAction="#handleEliminarMensaje"
+                                    style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                        </HBox>
+                    </top>
+
+                    <center>
+                        <SplitPane dividerPositions="0.6" style="-fx-padding: 0 15 15 15;">
+                            <!-- Lista de Mensajes -->
+                            <TableView fx:id="tblMensajes">
+                                <columns>
+                                    <TableColumn fx:id="colMensajeEmisor" text="De" prefWidth="120"/>
+                                    <TableColumn fx:id="colMensajeReceptor" text="Para" prefWidth="120"/>
+                                    <TableColumn fx:id="colAsunto" text="Asunto" prefWidth="200"/>
+                                    <TableColumn fx:id="colFechaEnvio" text="Fecha" prefWidth="120"/>
+                                </columns>
+                            </TableView>
+
+                            <!-- Contenido del Mensaje -->
+                            <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f7fafc; -fx-background-radius: 5;">
+                                <Label text="Contenido del Mensaje" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                <TextArea fx:id="txtContenidoMensaje" editable="false" wrapText="true" VBox.vgrow="ALWAYS"
+                                         style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 5;"/>
+                            </VBox>
+                        </SplitPane>
+                    </center>
+                </BorderPane>
+            </Tab>
+        </TabPane>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #edf2f7; -fx-padding: 10;">
+            <Label text="Sistema de Asistencia v1.0 | © 2024" style="-fx-text-fill: #718096; -fx-font-size: 11px;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
