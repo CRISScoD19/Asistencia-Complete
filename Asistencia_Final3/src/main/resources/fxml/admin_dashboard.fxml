@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="pe.edu.upeu.asistencia.controller.AdminDashboardController"
@@ -107,6 +108,49 @@
                         </SplitPane>
                     </center>
                 </BorderPane>
+            </Tab>
+
+            <!-- Tab Gestión de Vacaciones -->
+            <Tab text="🏖️ Vacaciones">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Gestión de Solicitudes de Vacaciones">
+                            <font>
+                                <Font name="System Bold" size="16.0"/>
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="🔄 Actualizar" onAction="#handleActualizarVacaciones"/>
+                    </HBox>
+
+                    <TableView fx:id="tblSolicitudesVacacion" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colVacEmpleado" text="Empleado" prefWidth="150"/>
+                            <TableColumn fx:id="colVacFechaInicio" text="Fecha Inicio" prefWidth="100"/>
+                            <TableColumn fx:id="colVacFechaFin" text="Fecha Fin" prefWidth="100"/>
+                            <TableColumn fx:id="colVacDias" text="Días" prefWidth="60"/>
+                            <TableColumn fx:id="colVacMotivo" text="Motivo" prefWidth="200"/>
+                            <TableColumn fx:id="colVacEstado" text="Estado" prefWidth="120"/>
+                            <TableColumn fx:id="colVacFechaSolicitud" text="Fecha Solicitud" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+
+                    <HBox spacing="10.0">
+                        <Button fx:id="btnAprobarVacacion" text="✓ Aprobar" onAction="#handleAprobarVacacion"
+                                style="-fx-background-color: #48bb78; -fx-text-fill: white;" prefWidth="120"/>
+                        <Button fx:id="btnRechazarVacacion" text="✗ Rechazar" onAction="#handleRechazarVacacion"
+                                style="-fx-background-color: #f56565; -fx-text-fill: white;" prefWidth="120"/>
+                        <Button text="👁️ Ver Detalle" onAction="#handleVerDetalleVacacion" prefWidth="120"/>
+                    </HBox>
+
+                    <VBox spacing="10" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;">
+
+                    </VBox>
+                </VBox>
             </Tab>
         </TabPane>
     </center>

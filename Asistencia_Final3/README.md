@@ -8,7 +8,7 @@ Ejecución recomendada (desde la raíz del proyecto):
 O abrir en IntelliJ y ejecutar la clase:
     pe.edu.upeu.asistencia.AsistenciaApplication
 
-Base de datos: ./data/asistencia.db (ya existe la carpeta data en el ZIP)
+Base de datos: ./data/ (ya existe la carpeta data en el ZIP)
 
 Usuarios iniciales:
  - admin / admin123 (rol ADMIN)

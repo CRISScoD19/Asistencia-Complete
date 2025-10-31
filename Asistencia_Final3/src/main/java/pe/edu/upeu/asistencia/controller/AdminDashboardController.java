@@ -20,6 +20,10 @@ import pe.edu.upeu.asistencia.service.MensajeService;
 import pe.edu.upeu.asistencia.service.UsuarioService;
 import pe.edu.upeu.asistencia.config.SessionManager;
 import pe.edu.upeu.asistencia.config.StageManager;
+import pe.edu.upeu.asistencia.model.SolicitudVacacion;
+import pe.edu.upeu.asistencia.service.SolicitudVacacionService;
+import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
+import java.time.format.DateTimeFormatter;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -58,6 +62,21 @@ public class AdminDashboardController {
     @FXML private Button btnEliminarMensaje;
     @FXML private TextArea txtContenidoMensaje;
 
+    // Tab Vacaciones
+    @FXML private TableView<SolicitudVacacion> tblSolicitudesVacacion;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacEmpleado;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacFechaInicio;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacFechaFin;
+    @FXML private TableColumn<SolicitudVacacion, Integer> colVacDias;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacMotivo;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacEstado;
+    @FXML private TableColumn<SolicitudVacacion, String> colVacFechaSolicitud;
+    @FXML private Button btnAprobarVacacion;
+    @FXML private Button btnRechazarVacacion;
+
+    @Autowired
+    private SolicitudVacacionService solicitudVacacionService;
+
     @Autowired
     private UsuarioService usuarioService;
 
@@ -76,6 +95,7 @@ public class AdminDashboardController {
     private ObservableList<Usuario> usuarios = FXCollections.observableArrayList();
     private ObservableList<Asistencia> asistencias = FXCollections.observableArrayList();
     private ObservableList<Mensaje> mensajes = FXCollections.observableArrayList();
+    private ObservableList<SolicitudVacacion> solicitudesVacacion = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -86,6 +106,8 @@ public class AdminDashboardController {
         cargarUsuarios();
         cargarAsistencias();
         cargarMensajes();
+        configurarTablaVacaciones();
+        cargarSolicitudesVacaciones();
     }
 
     // ========== CONFIGURACIÓN DE TABLAS ==========
@@ -370,5 +392,157 @@ public class AdminDashboardController {
         alert.setHeaderText(null);
         alert.setContentText(contenido);
         alert.showAndWait();
+    }
+    // ========== CONFIGURACIÓN TABLA VACACIONES ==========
+
+    private void configurarTablaVacaciones() {
+        if (colVacEmpleado != null) {
+            colVacEmpleado.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            cellData.getValue().getEmpleado().getNombre()
+                    )
+            );
+            colVacFechaInicio.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            cellData.getValue().getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    )
+            );
+            colVacFechaFin.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            cellData.getValue().getFechaFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    )
+            );
+            colVacDias.setCellValueFactory(new PropertyValueFactory<>("diasSolicitados"));
+            colVacMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
+            colVacEstado.setCellValueFactory(cellData -> {
+                String estado = cellData.getValue().getEstado().toString();
+                String emoji = "";
+                switch (estado) {
+                    case "PENDIENTE": emoji = "🟡 "; break;
+                    case "APROBADA": emoji = "🟢 "; break;
+                    case "RECHAZADA": emoji = "🔴 "; break;
+                }
+                return new javafx.beans.property.SimpleStringProperty(emoji + estado);
+            });
+            colVacFechaSolicitud.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            cellData.getValue().getFechaSolicitud().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    )
+            );
+
+            tblSolicitudesVacacion.setItems(solicitudesVacacion);
+        }
+    }
+
+    private void cargarSolicitudesVacaciones() {
+        solicitudesVacacion.clear();
+        solicitudesVacacion.addAll(solicitudVacacionService.listarTodas());
+    }
+
+// ========== GESTIÓN DE VACACIONES ==========
+
+    @FXML
+    private void handleAprobarVacacion() {
+        SolicitudVacacion seleccionada = tblSolicitudesVacacion.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione una solicitud", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (seleccionada.getEstado() != EstadoSolicitud.PENDIENTE) {
+            mostrarAlerta("Error", "Esta solicitud ya fue procesada", Alert.AlertType.ERROR);
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Aprobar Solicitud");
+        dialog.setHeaderText("Aprobar solicitud de vacaciones de " + seleccionada.getEmpleado().getNombre());
+        dialog.setContentText("Comentario (opcional):");
+
+        Optional<String> resultado = dialog.showAndWait();
+        resultado.ifPresent(comentario -> {
+            try {
+                Usuario admin = SessionManager.getInstance().getUsuarioActual();
+                solicitudVacacionService.aprobar(seleccionada.getId(), admin, comentario);
+                cargarSolicitudesVacaciones();
+                mostrarAlerta("Éxito", "Solicitud aprobada correctamente", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                mostrarAlerta("Error", e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    @FXML
+    private void handleRechazarVacacion() {
+        SolicitudVacacion seleccionada = tblSolicitudesVacacion.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione una solicitud", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (seleccionada.getEstado() != EstadoSolicitud.PENDIENTE) {
+            mostrarAlerta("Error", "Esta solicitud ya fue procesada", Alert.AlertType.ERROR);
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Rechazar Solicitud");
+        dialog.setHeaderText("Rechazar solicitud de vacaciones de " + seleccionada.getEmpleado().getNombre());
+        dialog.setContentText("Motivo del rechazo:");
+
+        Optional<String> resultado = dialog.showAndWait();
+        resultado.ifPresent(motivo -> {
+            if (motivo.trim().isEmpty()) {
+                mostrarAlerta("Error", "Debe indicar el motivo del rechazo", Alert.AlertType.ERROR);
+                return;
+            }
+            try {
+                Usuario admin = SessionManager.getInstance().getUsuarioActual();
+                solicitudVacacionService.rechazar(seleccionada.getId(), admin, motivo);
+                cargarSolicitudesVacaciones();
+                mostrarAlerta("Éxito", "Solicitud rechazada correctamente", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                mostrarAlerta("Error", e.getMessage(), Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    @FXML
+    private void handleVerDetalleVacacion() {
+        SolicitudVacacion seleccionada = tblSolicitudesVacacion.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione una solicitud", Alert.AlertType.WARNING);
+            return;
+        }
+
+        StringBuilder detalle = new StringBuilder();
+        detalle.append("SOLICITUD DE VACACIONES\n\n");
+        detalle.append("Empleado: ").append(seleccionada.getEmpleado().getNombre()).append("\n");
+        detalle.append("Fecha Inicio: ").append(seleccionada.getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("\n");
+        detalle.append("Fecha Fin: ").append(seleccionada.getFechaFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).append("\n");
+        detalle.append("Días: ").append(seleccionada.getDiasSolicitados()).append("\n");
+        detalle.append("Motivo: ").append(seleccionada.getMotivo()).append("\n");
+        detalle.append("Estado: ").append(seleccionada.getEstado()).append("\n");
+        detalle.append("Fecha Solicitud: ").append(seleccionada.getFechaSolicitud().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))).append("\n");
+
+        if (seleccionada.getFechaRespuesta() != null) {
+            detalle.append("\nFecha Respuesta: ").append(seleccionada.getFechaRespuesta().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))).append("\n");
+            detalle.append("Respondido por: ").append(seleccionada.getAprobadoPor().getNombre()).append("\n");
+            if (seleccionada.getComentarioAdmin() != null) {
+                detalle.append("Comentario Admin: ").append(seleccionada.getComentarioAdmin()).append("\n");
+            }
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Detalle de Solicitud");
+        alert.setHeaderText(null);
+        alert.setContentText(detalle.toString());
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleActualizarVacaciones() {
+        cargarSolicitudesVacaciones();
+        mostrarAlerta("Éxito", "Lista actualizada", Alert.AlertType.INFORMATION);
     }
 }

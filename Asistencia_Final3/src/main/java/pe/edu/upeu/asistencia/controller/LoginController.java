@@ -67,4 +67,4 @@ public class LoginController {
         lblError.setVisible(true);
         lblError.setStyle("-fx-text-fill: red;");
     }
-}
+} 
