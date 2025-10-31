@@ -20,7 +20,7 @@
 
         <!-- Logo/Título -->
         <VBox alignment="CENTER" spacing="5">
-            <Label text="🏢" style="-fx-font-size: 48px;"/>
+            <Label text="" style="-fx-font-size: 48px;"/>
             <Label text="Sistema de Asistencia" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #667eea;"/>
             <Label text="Ingrese sus credenciales" style="-fx-font-size: 14px; -fx-text-fill: #718096;"/>
         </VBox>

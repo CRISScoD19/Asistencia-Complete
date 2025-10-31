@@ -25,11 +25,10 @@ public class AsistenciaApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // ✅ ESTO ES LO QUE FALTABA: Configurar el Stage en el StageManager
+
         StageManager stageManager = springContext.getBean(StageManager.class);
         stageManager.setPrimaryStage(stage);
 
-        // Ahora carga la vista de login
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
         loader.setControllerFactory(springContext::getBean);
 

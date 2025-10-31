@@ -18,7 +18,7 @@
                     <Insets top="15" right="20" bottom="15" left="20"/>
                 </padding>
 
-                <Label text="Mi Panel">
+                <Label text=" Mi Panel">
                     <font>
                         <Font name="System Bold" size="20.0"/>
                     </font>
@@ -28,7 +28,7 @@
 
                 <Label fx:id="lblUsuario" text="Empleado: "/>
                 <Label fx:id="lblMensajesNoLeidos" text="Mensajes: 0" styleClass="badge"/>
-                <Button text="Cerrar Sesión" onAction="#handleCerrarSesion" styleClass="btn-secondary"/>
+                <Button text=" Cerrar Sesión" onAction="#handleCerrarSesion" styleClass="btn-secondary"/>
             </HBox>
         </VBox>
     </top>
@@ -38,7 +38,7 @@
         <TabPane tabClosingPolicy="UNAVAILABLE">
 
             <!-- Tab Mi Perfil -->
-            <Tab text="📋 Mi Perfil">
+            <Tab text="👤 Mi Perfil">
                 <ScrollPane fitToWidth="true" fitToHeight="true">
                     <VBox spacing="20.0" alignment="TOP_CENTER">
                         <padding>
@@ -69,7 +69,7 @@
 
                         <!-- Registrar Asistencia -->
                         <VBox spacing="12" alignment="CENTER" styleClass="asistencia-box">
-                            <Label text="✓ Registrar Asistencia de Hoy">
+                            <Label text=" Registrar Asistencia de Hoy">
                                 <font>
                                     <Font name="System Bold" size="16.0"/>
                                 </font>
@@ -88,13 +88,26 @@
                                 </Label>
                             </HBox>
 
-                            <Button fx:id="btnMarcarAsistencia" text="✓ Marcar Asistencia"
-                                    onAction="#handleMarcarAsistencia" styleClass="btn-primary"
-                                    prefWidth="200" prefHeight="40">
-                                <font>
-                                    <Font name="System Bold" size="14.0"/>
-                                </font>
-                            </Button>
+                            <!-- BOTONES DE ENTRADA Y SALIDA -->
+                            <HBox spacing="15" alignment="CENTER">
+                                <Button fx:id="btnMarcarAsistencia" text=" Marcar Entrada"
+                                        onAction="#handleMarcarAsistencia"
+                                        style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"
+                                        prefWidth="180" prefHeight="40">
+                                    <font>
+                                        <Font name="System Bold" size="14.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button fx:id="btnRegistrarSalida" text="🏁 Registrar Salida"
+                                        onAction="#handleRegistrarSalida"
+                                        style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"
+                                        prefWidth="180" prefHeight="40">
+                                    <font>
+                                        <Font name="System Bold" size="14.0"/>
+                                    </font>
+                                </Button>
+                            </HBox>
 
                             <Label fx:id="lblMensajeAsistencia" styleClass="success-label"
                                    visible="false" wrapText="true"/>
@@ -104,7 +117,7 @@
             </Tab>
 
             <!-- Tab Mis Asistencias -->
-            <Tab text="📊 Mis Asistencias">
+            <Tab text=" Mis Asistencias">
                 <VBox spacing="15.0">
                     <padding>
                         <Insets top="20" right="20" bottom="20" left="20"/>
@@ -117,7 +130,7 @@
                             </font>
                         </Label>
                         <ComboBox fx:id="cboPeriodo" promptText="Seleccione período" prefWidth="150"/>
-                        <Button text="🔍 Buscar" onAction="#handleBuscarMisAsistencias"/>
+                        <Button text=" Buscar" onAction="#handleBuscarMisAsistencias"/>
                     </HBox>
 
                     <TableView fx:id="tableMisAsistencias" VBox.vgrow="ALWAYS">
@@ -139,29 +152,29 @@
                     </Label>
                     <HBox spacing="20.0" alignment="CENTER">
                         <Label fx:id="lblTotalPresente" text="✓ Presente: 0" styleClass="stat-label"
-                               style="-fx-background-color: #d4edda; -fx-text-fill: #155724;"/>
-                        <Label fx:id="lblTotalTarde" text="⏰ Tarde: 0" styleClass="stat-label"
-                               style="-fx-background-color: #fff3cd; -fx-text-fill: #856404;"/>
+                               style="-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 8;"/>
+                        <Label fx:id="lblTotalTarde" text="⚠ Tarde: 0" styleClass="stat-label"
+                               style="-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-padding: 8;"/>
                         <Label fx:id="lblTotalAusente" text="✗ Ausente: 0" styleClass="stat-label"
-                               style="-fx-background-color: #f8d7da; -fx-text-fill: #721c24;"/>
-                        <Label fx:id="lblTotalJustificado" text="📝 Justificado: 0" styleClass="stat-label"
-                               style="-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460;"/>
+                               style="-fx-background-color: #f8d7da; -fx-text-fill: #721c24; -fx-padding: 8;"/>
+                        <Label fx:id="lblTotalJustificado" text="ℹ Justificado: 0" styleClass="stat-label"
+                               style="-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460; -fx-padding: 8;"/>
                     </HBox>
                 </VBox>
             </Tab>
 
-            <!-- Tab Mis Vacaciones (NUEVO) -->
-            <Tab text="🏖️ Mis Vacaciones">
+            <!-- Tab Mis Vacaciones -->
+            <Tab text=" Mis Vacaciones">
                 <VBox spacing="15.0">
                     <padding>
                         <Insets top="20" right="20" bottom="20" left="20"/>
                     </padding>
 
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <Button text="➕ Solicitar Vacaciones" onAction="#handleSolicitarVacaciones"
-                                styleClass="btn-primary"/>
+                        <Button text=" Solicitar Vacaciones" onAction="#handleSolicitarVacaciones"
+                                style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="🔄 Actualizar" onAction="#handleActualizarVacaciones"/>
+                        <Button text=" Actualizar" onAction="#handleActualizarVacaciones"/>
                     </HBox>
 
                     <TableView fx:id="tableMisVacaciones" VBox.vgrow="ALWAYS">
@@ -176,20 +189,26 @@
                     </TableView>
 
                     <VBox spacing="10" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;">
-
+                        <Label text="ℹ Estado de solicitudes:" style="-fx-font-weight: bold;"/>
+                        <Label text=" PENDIENTE: En espera de aprobación"/>
+                        <Label text=" APROBADA: Solicitud aceptada"/>
+                        <Label text=" RECHAZADA: Solicitud denegada"/>
                     </VBox>
                 </VBox>
             </Tab>
 
            <!-- Tab Mis Mensajes -->
-           <Tab text="✉️ Mis Mensajes">
+           <Tab text="✉ Mis Mensajes">
                <VBox spacing="15.0">
                    <padding>
                        <Insets top="20" right="20" bottom="20" left="20"/>
                    </padding>
 
+                   <!-- BOTONES ACTUALIZADOS CON NUEVO MENSAJE -->
                    <HBox spacing="10.0">
-                       <Button text="🔄 Actualizar" onAction="#handleActualizarMensajes"/>
+                       <Button text=" Nuevo Mensaje" onAction="#handleNuevoMensaje"
+                               style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+                       <Button text=" Actualizar" onAction="#handleActualizarMensajes"/>
                        <Button text="✓ Marcar todos como leídos" onAction="#handleMarcarTodosLeidos"/>
                    </HBox>
 
@@ -204,15 +223,23 @@
 
                    <!-- Área para mostrar contenido del mensaje -->
                    <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;">
-                       <Label text="📄 Contenido del mensaje:" styleClass="label-bold"/>
+                       <Label text="📄 Contenido del mensaje:" style="-fx-font-weight: bold;"/>
                        <TextArea fx:id="txtMensajeContenido" wrapText="true" editable="false"
-                                 prefHeight="150" promptText="Seleccione un mensaje para ver su contenido"/>
+                                 prefHeight="150" promptText="Seleccione un mensaje para ver su contenido"
+                                 style="-fx-border-color: #dee2e6;"/>
                    </VBox>
 
-                   <Label text="💡 Tip: Haz clic en un mensaje para leer su contenido"
-                          style="-fx-text-fill: #6c757d; -fx-font-style: italic;"/>
+                   <Label text=" Tip: Ahora puedes enviar mensajes al administrador y a tus compañeros empleados"
+                          style="-fx-text-fill: #48bb78; -fx-font-style: italic; -fx-font-weight: bold;"/>
                </VBox>
            </Tab>
         </TabPane>
     </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #edf2f7; -fx-padding: 10;">
+            <Label text="Sistema de Asistencia v1.0 | © 2024" style="-fx-text-fill: #718096; -fx-font-size: 11px;"/>
+        </HBox>
+    </bottom>
 </BorderPane>

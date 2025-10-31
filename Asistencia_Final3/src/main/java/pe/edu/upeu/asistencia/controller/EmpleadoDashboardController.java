@@ -13,16 +13,14 @@ import pe.edu.upeu.asistencia.model.Mensaje;
 import pe.edu.upeu.asistencia.model.Usuario;
 import pe.edu.upeu.asistencia.service.AsistenciaService;
 import pe.edu.upeu.asistencia.service.MensajeService;
+import pe.edu.upeu.asistencia.service.UsuarioService;
 import pe.edu.upeu.asistencia.config.SessionManager;
 import pe.edu.upeu.asistencia.config.StageManager;
 import pe.edu.upeu.asistencia.model.SolicitudVacacion;
 import pe.edu.upeu.asistencia.service.SolicitudVacacionService;
-import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
-import java.time.LocalDate;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ButtonBar;
+import pe.edu.upeu.asistencia.enums.Rol;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -33,8 +31,8 @@ public class EmpleadoDashboardController {
     @FXML private Label lblUsername;
     @FXML private Label lblRol;
     @FXML private Button btnMarcarAsistencia;
+    @FXML private Button btnRegistrarSalida; // NUEVO BOTÓN
 
-    // Campos adicionales del FXML
     @FXML private Label lblUsuario;
     @FXML private Label lblEmail;
     @FXML private Label lblTelefono;
@@ -43,14 +41,12 @@ public class EmpleadoDashboardController {
     @FXML private Label lblMensajeAsistencia;
     @FXML private ComboBox<String> cboPeriodo;
 
-    // Tabla Mis Asistencias (original)
+    // Tabla Asistencias
     @FXML private TableView<Asistencia> tblMisAsistencias;
     @FXML private TableColumn<Asistencia, String> colFecha;
     @FXML private TableColumn<Asistencia, String> colHoraEntrada;
     @FXML private TableColumn<Asistencia, String> colHoraSalida;
     @FXML private TableColumn<Asistencia, String> colEstado;
-
-    // Tabla Mis Asistencias (nuevas columnas del FXML)
     @FXML private TableView<Asistencia> tableMisAsistencias;
     @FXML private TableColumn<Asistencia, String> colMiAsistFecha;
     @FXML private TableColumn<Asistencia, String> colMiAsistEntrada;
@@ -58,13 +54,11 @@ public class EmpleadoDashboardController {
     @FXML private TableColumn<Asistencia, String> colMiAsistEstado;
     @FXML private TableColumn<Asistencia, String> colMiAsistObs;
 
-    // Labels de estadísticas
     @FXML private Label lblTotalPresente;
     @FXML private Label lblTotalTarde;
     @FXML private Label lblTotalAusente;
     @FXML private Label lblTotalJustificado;
 
-    // Tabla de vacaciones
     @FXML private TableView<Object> tableMisVacaciones;
     @FXML private TableColumn<Object, String> colVacFechaInicio;
     @FXML private TableColumn<Object, String> colVacFechaFin;
@@ -73,15 +67,13 @@ public class EmpleadoDashboardController {
     @FXML private TableColumn<Object, String> colVacFechaSolicitud;
     @FXML private TableColumn<Object, String> colVacAcciones;
 
-    // Tabla Mensajes (original)
+    // Tabla Mensajes
     @FXML private TableView<Mensaje> tblMensajes;
     @FXML private TableColumn<Mensaje, String> colEmisor;
     @FXML private TableColumn<Mensaje, String> colAsunto;
     @FXML private TableColumn<Mensaje, String> colLeido;
     @FXML private TextArea txtMensajeContenido;
     @FXML private Label lblMensajesNoLeidos;
-
-    // Tabla de mensajes (nuevas columnas del FXML)
     @FXML private TableView<Mensaje> tableMisMensajes;
     @FXML private TableColumn<Mensaje, String> colMiMsjEmisor;
     @FXML private TableColumn<Mensaje, String> colMiMsjAsunto;
@@ -89,20 +81,12 @@ public class EmpleadoDashboardController {
     @FXML private TableColumn<Mensaje, String> colMiMsjLeido;
     @FXML private TableColumn<Mensaje, String> colMiMsjAcciones;
 
-    @Autowired
-    private AsistenciaService asistenciaService;
-
-    @Autowired
-    private MensajeService mensajeService;
-
-    @Autowired
-    private ConfigurableApplicationContext springContext;
-
-    @Autowired
-    private StageManager stageManager;
-
-    @Autowired
-    private SolicitudVacacionService solicitudVacacionService;
+    @Autowired private AsistenciaService asistenciaService;
+    @Autowired private MensajeService mensajeService;
+    @Autowired private UsuarioService usuarioService;
+    @Autowired private ConfigurableApplicationContext springContext;
+    @Autowired private StageManager stageManager;
+    @Autowired private SolicitudVacacionService solicitudVacacionService;
 
     private Usuario usuarioActual;
     private ObservableList<Asistencia> asistencias = FXCollections.observableArrayList();
@@ -112,14 +96,11 @@ public class EmpleadoDashboardController {
     @FXML
     public void initialize() {
         usuarioActual = SessionManager.getInstance().getUsuarioActual();
-
         mostrarDatosUsuario();
         configurarTablaAsistencias();
         configurarTablaMensajes();
-
         cargarAsistencias();
         cargarMensajes();
-
         configurarTablaVacacionesEmpleado();
         cargarMisVacaciones();
     }
@@ -157,7 +138,6 @@ public class EmpleadoDashboardController {
             }
         }
 
-        // Configurar tabla adicional si existe
         if (tableMisAsistencias != null && colMiAsistFecha != null) {
             colMiAsistFecha.setCellValueFactory(cellData ->
                     new javafx.beans.property.SimpleStringProperty(
@@ -196,7 +176,6 @@ public class EmpleadoDashboardController {
 
             tblMensajes.setItems(mensajes);
 
-            // Mostrar contenido y marcar como leído
             tblMensajes.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
                 if (newVal != null && txtMensajeContenido != null) {
                     txtMensajeContenido.setText(newVal.getContenido());
@@ -208,7 +187,6 @@ public class EmpleadoDashboardController {
             });
         }
 
-        // Configurar tabla adicional si existe
         if (tableMisMensajes != null && colMiMsjEmisor != null) {
             colMiMsjEmisor.setCellValueFactory(cellData ->
                     new javafx.beans.property.SimpleStringProperty(
@@ -253,6 +231,83 @@ public class EmpleadoDashboardController {
             mostrarAlerta("Éxito", "Asistencia registrada correctamente", Alert.AlertType.INFORMATION);
         } catch (Exception e) {
             mostrarAlerta("Error", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void handleRegistrarSalida() {
+        try {
+            // Buscar asistencia de hoy sin hora de salida
+            Asistencia asistenciaHoy = asistencias.stream()
+                    .filter(a -> a.getFecha().equals(LocalDate.now()) && a.getHoraSalida() == null)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No hay registro de entrada para hoy"));
+
+            asistenciaService.registrarSalida(asistenciaHoy.getId());
+            cargarAsistencias();
+            mostrarAlerta("Éxito", "Hora de salida registrada correctamente", Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            mostrarAlerta("Error", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void handleNuevoMensaje() {
+        Dialog<Mensaje> dialog = new Dialog<>();
+        dialog.setTitle("Nuevo Mensaje");
+        dialog.setHeaderText("Enviar mensaje");
+
+        ButtonType btnEnviar = new ButtonType("Enviar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnEnviar, ButtonType.CANCEL);
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        // ComboBox para seleccionar destinatario
+        ComboBox<Usuario> cmbReceptor = new ComboBox<>();
+
+        // Cargar ADMIN y otros EMPLEADOS
+        cmbReceptor.getItems().addAll(
+                usuarioService.listarTodos().stream()
+                        .filter(u -> u.getRol() == Rol.ADMIN ||
+                                (u.getRol() == Rol.EMPLEADO && !u.getId().equals(usuarioActual.getId())))
+                        .toList()
+        );
+
+        TextField txtAsunto = new TextField();
+        TextArea txtContenido = new TextArea();
+        txtContenido.setPrefRowCount(4);
+
+        grid.add(new Label("Para:"), 0, 0);
+        grid.add(cmbReceptor, 1, 0);
+        grid.add(new Label("Asunto:"), 0, 1);
+        grid.add(txtAsunto, 1, 1);
+        grid.add(new Label("Mensaje:"), 0, 2);
+        grid.add(txtContenido, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == btnEnviar) {
+                if (cmbReceptor.getValue() == null || txtAsunto.getText().trim().isEmpty()) {
+                    mostrarAlerta("Error", "Seleccione destinatario y escriba un asunto", Alert.AlertType.ERROR);
+                    return null;
+                }
+
+                return mensajeService.enviarMensaje(
+                        usuarioActual,
+                        cmbReceptor.getValue(),
+                        txtAsunto.getText(),
+                        txtContenido.getText()
+                );
+            }
+            return null;
+        });
+
+        Optional<Mensaje> resultado = dialog.showAndWait();
+        if (resultado.isPresent()) {
+            mostrarAlerta("Éxito", "Mensaje enviado correctamente", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -361,9 +416,9 @@ public class EmpleadoDashboardController {
                 String estado = ((SolicitudVacacion) cellData.getValue()).getEstado().toString();
                 String emoji = "";
                 switch (estado) {
-                    case "PENDIENTE": emoji = "🟡 "; break;
-                    case "APROBADA": emoji = "🟢 "; break;
-                    case "RECHAZADA": emoji = "🔴 "; break;
+                    case "PENDIENTE": emoji = "😑 "; break;
+                    case "APROBADA": emoji = "😁"; break;
+                    case "RECHAZADA": emoji = "😢"; break;
                 }
                 return new javafx.beans.property.SimpleStringProperty(emoji + estado);
             });

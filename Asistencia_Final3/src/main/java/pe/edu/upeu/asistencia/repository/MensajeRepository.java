@@ -12,13 +12,13 @@ import java.util.List;
 @Repository
 public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
 
-    // Mensajes recibidos por un usuario
+    // Mensajes recibidos
     List<Mensaje> findByReceptorOrderByFechaEnvioDesc(Usuario receptor);
 
-    // Mensajes enviados por un usuario
+    // Mensajes enviados
     List<Mensaje> findByEmisorOrderByFechaEnvioDesc(Usuario emisor);
 
-    // Mensajes no leídos de un receptor
+    // Mensajes no leídos
     List<Mensaje> findByReceptorAndLeidoFalseOrderByFechaEnvioDesc(Usuario receptor);
 
     // Contar mensajes no leídos
@@ -28,7 +28,7 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
     @Query("SELECT m FROM Mensaje m WHERE (m.emisor = :usuario1 AND m.receptor = :usuario2) OR (m.emisor = :usuario2 AND m.receptor = :usuario1) ORDER BY m.fechaEnvio DESC")
     List<Mensaje> findConversacion(@Param("usuario1") Usuario usuario1, @Param("usuario2") Usuario usuario2);
 
-    // Mensajes recibidos (últimos 20) - VERSIÓN CORREGIDA
+    // Mensajes recibidos
     @Query("SELECT m FROM Mensaje m WHERE m.receptor = :receptor ORDER BY m.fechaEnvio DESC")
     List<Mensaje> findTop20ByReceptorOrderByFechaEnvioDesc(@Param("receptor") Usuario receptor);
 }

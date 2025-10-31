@@ -47,9 +47,9 @@
     <!-- Botones -->
     <Separator/>
     <HBox spacing="10" alignment="CENTER">
-        <Button fx:id="btnGuardar" text="💾 Guardar" onAction="#handleGuardar"
+        <Button fx:id="btnGuardar" text=" Guardar" onAction="#handleGuardar"
                 style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 5; -fx-cursor: hand;"/>
-        <Button fx:id="btnCancelar" text="❌ Cancelar" onAction="#handleCancelar"
+        <Button fx:id="btnCancelar" text=" Cancelar" onAction="#handleCancelar"
                 style="-fx-background-color: #cbd5e0; -fx-text-fill: #2d3748; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 5; -fx-cursor: hand;"/>
     </HBox>
 </VBox>

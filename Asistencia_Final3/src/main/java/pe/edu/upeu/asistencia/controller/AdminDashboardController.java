@@ -25,13 +25,12 @@ import pe.edu.upeu.asistencia.service.SolicitudVacacionService;
 import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
 import java.time.format.DateTimeFormatter;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
 public class AdminDashboardController {
 
-    // Tab Usuarios
+    // para Usuarios
     @FXML private TableView<Usuario> tblUsuarios;
     @FXML private TableColumn<Usuario, Long> colId;
     @FXML private TableColumn<Usuario, String> colNombre;
@@ -41,7 +40,7 @@ public class AdminDashboardController {
     @FXML private Button btnEditarUsuario;
     @FXML private Button btnEliminarUsuario;
 
-    // Tab Asistencias
+    // para Asistencias
     @FXML private TableView<Asistencia> tblAsistencias;
     @FXML private TableColumn<Asistencia, Long> colAsistenciaId;
     @FXML private TableColumn<Asistencia, String> colEmpleado;
@@ -52,7 +51,7 @@ public class AdminDashboardController {
     @FXML private Button btnRegistrarAsistencia;
     @FXML private Button btnEliminarAsistencia;
 
-    // Tab Mensajes
+    // para Mensajes
     @FXML private TableView<Mensaje> tblMensajes;
     @FXML private TableColumn<Mensaje, String> colMensajeEmisor;
     @FXML private TableColumn<Mensaje, String> colMensajeReceptor;
@@ -62,7 +61,7 @@ public class AdminDashboardController {
     @FXML private Button btnEliminarMensaje;
     @FXML private TextArea txtContenidoMensaje;
 
-    // Tab Vacaciones
+    // para Vacaciones
     @FXML private TableView<SolicitudVacacion> tblSolicitudesVacacion;
     @FXML private TableColumn<SolicitudVacacion, String> colVacEmpleado;
     @FXML private TableColumn<SolicitudVacacion, String> colVacFechaInicio;
@@ -110,7 +109,7 @@ public class AdminDashboardController {
         cargarSolicitudesVacaciones();
     }
 
-    // ========== CONFIGURACIÓN DE TABLAS ==========
+    //CONFIGURACIÓN DE TABLAS
 
     private void configurarTablaUsuarios() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -141,11 +140,10 @@ public class AdminDashboardController {
         colHoraSalida.setCellValueFactory(cellData -> {
             String horaSalida = cellData.getValue().getHoraSalida() != null
                     ? cellData.getValue().getHoraSalida().format(DateTimeFormatter.ofPattern("HH:mm"))
-                    : "---";
+                    : " ";
             return new javafx.beans.property.SimpleStringProperty(horaSalida);
         });
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
-
         tblAsistencias.setItems(asistencias);
     }
 
@@ -179,7 +177,7 @@ public class AdminDashboardController {
         });
     }
 
-    // ========== CARGAR DATOS ==========
+    // CARGAR DATOS
 
     private void cargarUsuarios() {
         usuarios.clear();
@@ -197,10 +195,11 @@ public class AdminDashboardController {
         mensajes.addAll(mensajeService.obtenerMensajesRecibidos(admin));
     }
 
-    // ========== CRUD USUARIOS ==========
+    // CRUD USUARIOS
 
     @FXML
     private void handleNuevoUsuario() {
+
         abrirFormularioUsuario(null);
     }
 
@@ -263,11 +262,10 @@ public class AdminDashboardController {
         }
     }
 
-    // ========== ASISTENCIAS ==========
+    // ASISTENCIAS
 
     @FXML
     private void handleRegistrarAsistencia() {
-        // Mostrar diálogo para seleccionar empleado
         ChoiceDialog<Usuario> dialog = new ChoiceDialog<>(null,
                 usuarioService.listarTodos().stream()
                         .filter(u -> u.getRol().toString().equals("EMPLEADO"))
@@ -299,17 +297,17 @@ public class AdminDashboardController {
 
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Confirmar eliminación");
-        confirmacion.setContentText("¿Eliminar esta asistencia?");
+        confirmacion.setContentText("¿Quiere eliminar asistencia?");
 
         Optional<ButtonType> resultado = confirmacion.showAndWait();
         if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
             asistenciaService.eliminarAsistencia(seleccionada.getId());
             cargarAsistencias();
-            mostrarAlerta("Éxito", "Asistencia eliminada", Alert.AlertType.INFORMATION);
+            mostrarAlerta("Hecho", "Asistencia eliminada", Alert.AlertType.INFORMATION);
         }
     }
 
-    // ========== MENSAJES ==========
+    // MENSAJES
 
     @FXML
     private void handleNuevoMensaje() {
@@ -338,7 +336,7 @@ public class AdminDashboardController {
 
         grid.add(new Label("Receptor:"), 0, 0);
         grid.add(cmbReceptor, 1, 0);
-        grid.add(new Label("Asunto:"), 0, 1);
+        grid.add(new Label("Asunto:"), 0, 1);//filas y columnas
         grid.add(txtAsunto, 1, 1);
         grid.add(new Label("Contenido:"), 0, 2);
         grid.add(txtContenido, 1, 2);
@@ -370,7 +368,7 @@ public class AdminDashboardController {
     private void handleEliminarMensaje() {
         Mensaje seleccionado = tblMensajes.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
-            mostrarAlerta("Selección requerida", "Por favor seleccione un mensaje", Alert.AlertType.WARNING);
+            mostrarAlerta("Seleccione el mensaje", "Por favor seleccione un mensaje", Alert.AlertType.WARNING);
             return;
         }
 
@@ -393,7 +391,7 @@ public class AdminDashboardController {
         alert.setContentText(contenido);
         alert.showAndWait();
     }
-    // ========== CONFIGURACIÓN TABLA VACACIONES ==========
+    // CONFIGURACIÓN TABLA VACACIONES
 
     private void configurarTablaVacaciones() {
         if (colVacEmpleado != null) {
@@ -418,9 +416,9 @@ public class AdminDashboardController {
                 String estado = cellData.getValue().getEstado().toString();
                 String emoji = "";
                 switch (estado) {
-                    case "PENDIENTE": emoji = "🟡 "; break;
-                    case "APROBADA": emoji = "🟢 "; break;
-                    case "RECHAZADA": emoji = "🔴 "; break;
+                    case "PENDIENTE": emoji = "😑 "; break;
+                    case "APROBADA": emoji = "😁"; break;
+                    case "RECHAZADA": emoji = "😢"; break;
                 }
                 return new javafx.beans.property.SimpleStringProperty(emoji + estado);
             });
@@ -439,7 +437,7 @@ public class AdminDashboardController {
         solicitudesVacacion.addAll(solicitudVacacionService.listarTodas());
     }
 
-// ========== GESTIÓN DE VACACIONES ==========
+//GESTIÓN DE VACACIONES
 
     @FXML
     private void handleAprobarVacacion() {

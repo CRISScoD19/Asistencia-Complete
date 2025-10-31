@@ -24,7 +24,7 @@ public class LoginController {
 
     @Autowired
     public LoginController(UsuarioService usuarioService, StageManager stageManager) {
-        this.usuarioService = usuarioService;  // ✅ this.variable = parámetro
+        this.usuarioService = usuarioService;
         this.stageManager = stageManager;
     }
 
@@ -48,10 +48,9 @@ public class LoginController {
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
 
-            // ✅ Usar SessionManager como Singleton
             SessionManager.getInstance().setUsuarioActual(usuario);
 
-            // Cambiar vista según el rol
+            // Cambiar según el rol
             if (usuario.getRol() == Rol.ADMIN) {
                 stageManager.cambiarEscena("/fxml/admin_dashboard.fxml", "Panel de Administración", 900, 600);
             } else {

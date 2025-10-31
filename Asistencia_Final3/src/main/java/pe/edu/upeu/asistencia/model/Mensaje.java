@@ -40,7 +40,6 @@ public class Mensaje {
     @Column(nullable = false)
     private Boolean leido = false;
 
-    // Constructor personalizado - ✅ CORREGIDO
     public Mensaje(Usuario emisor, Usuario receptor, String asunto, String contenido) {
         this.emisor = emisor;
         this.receptor = receptor;

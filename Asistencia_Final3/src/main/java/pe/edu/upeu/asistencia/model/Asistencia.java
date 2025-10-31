@@ -19,12 +19,12 @@ public class Asistencia {
     private Usuario usuario;
 
     @Column(nullable = false)
-    private LocalDate fecha;  // ✅ Para la fecha
+    private LocalDate fecha;
 
     @Column(nullable = false)
-    private LocalTime horaEntrada;  // ✅ Para la hora de entrada
+    private LocalTime horaEntrada;
 
-    private LocalTime horaSalida;  // ✅ Para la hora de salida (puede ser null)
+    private LocalTime horaSalida;
 
     @Column(nullable = false)
     private String estado = "PRESENTE";

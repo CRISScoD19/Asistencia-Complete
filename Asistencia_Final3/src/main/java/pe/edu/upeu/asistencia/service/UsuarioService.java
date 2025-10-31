@@ -51,23 +51,22 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuario> buscarPorId(Long id) {
-        return usuarioRepository.findById(id);
-    }
+    //public Optional<Usuario> buscarPorId(Long id) {
+      //  return usuarioRepository.findById(id);
+    //}
 
-    public Optional<Usuario> buscarPorUsername(String username) {
-        return usuarioRepository.findByUsername(username);
-    }
+    //public Optional<Usuario> buscarPorUsername(String username) {
+      //  return usuarioRepository.findByUsername(username);
+    //}
 
     public boolean existeUsername(String username) {
         return usuarioRepository.existsByUsername(username);
     }
 
-    public List<Usuario> listarPorRol(Rol rol) {
-        return usuarioRepository.findByRol(rol);
-    }
+    //public List<Usuario> listarPorRol(Rol rol) {
+      //  return usuarioRepository.findByRol(rol);
+    //}
 
-    // ✅ MÉTODO CORREGIDO
     public void crearUsuario(String nombre, String username, String password, Rol rol) {
         Usuario usuario = new Usuario();
         usuario.setNombre(nombre);

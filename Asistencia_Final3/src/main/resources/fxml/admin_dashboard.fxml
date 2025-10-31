@@ -12,9 +12,9 @@
     <!-- Header -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #667eea; -fx-padding: 15;">
-            <Label text="👨‍💼 Panel de Administración" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Panel de Administración" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="🚪 Cerrar Sesión" onAction="#handleCerrarSesion"
+            <Button text=" Cerrar Sesión" onAction="#handleCerrarSesion"
                     style="-fx-background-color: white; -fx-text-fill: #667eea; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>
     </top>
@@ -24,16 +24,16 @@
         <TabPane tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: white;">
 
             <!-- TAB USUARIOS -->
-            <Tab text="👥 Usuarios">
+            <Tab text=" Usuarios">
                 <VBox spacing="10" style="-fx-padding: 15;">
 
                     <!-- Toolbar -->
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Button fx:id="btnNuevoUsuario" text="➕ Nuevo Usuario" onAction="#handleNuevoUsuario"
+                        <Button fx:id="btnNuevoUsuario" text=" Nuevo Usuario" onAction="#handleNuevoUsuario"
                                 style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-                        <Button fx:id="btnEditarUsuario" text="✏️ Editar" onAction="#handleEditarUsuario"
+                        <Button fx:id="btnEditarUsuario" text=" Editar" onAction="#handleEditarUsuario"
                                 style="-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-                        <Button fx:id="btnEliminarUsuario" text="🗑️ Eliminar" onAction="#handleEliminarUsuario"
+                        <Button fx:id="btnEliminarUsuario" text=" Eliminar" onAction="#handleEliminarUsuario"
                                 style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
                     </HBox>
 
@@ -50,14 +50,14 @@
             </Tab>
 
             <!-- TAB ASISTENCIAS -->
-            <Tab text="📅 Asistencias">
+            <Tab text=" Asistencias">
                 <VBox spacing="10" style="-fx-padding: 15;">
 
                     <!-- Toolbar -->
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Button fx:id="btnRegistrarAsistencia" text="➕ Registrar Asistencia" onAction="#handleRegistrarAsistencia"
+                        <Button fx:id="btnRegistrarAsistencia" text=" Registrar Asistencia" onAction="#handleRegistrarAsistencia"
                                 style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-                        <Button fx:id="btnEliminarAsistencia" text="🗑️ Eliminar" onAction="#handleEliminarAsistencia"
+                        <Button fx:id="btnEliminarAsistencia" text="Eliminar" onAction="#handleEliminarAsistencia"
                                 style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
                     </HBox>
 
@@ -76,13 +76,13 @@
             </Tab>
 
             <!-- TAB MENSAJES -->
-            <Tab text="✉️ Mensajes">
+            <Tab text="Mensajes">
                 <BorderPane>
                     <top>
                         <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15;">
-                            <Button fx:id="btnNuevoMensaje" text="➕ Nuevo Mensaje" onAction="#handleNuevoMensaje"
+                            <Button fx:id="btnNuevoMensaje" text=" Nuevo Mensaje" onAction="#handleNuevoMensaje"
                                     style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
-                            <Button fx:id="btnEliminarMensaje" text="🗑️ Eliminar" onAction="#handleEliminarMensaje"
+                            <Button fx:id="btnEliminarMensaje" text=" Eliminar" onAction="#handleEliminarMensaje"
                                     style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"/>
                         </HBox>
                     </top>
@@ -100,10 +100,16 @@
                             </TableView>
 
                             <!-- Contenido del Mensaje -->
-                            <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f7fafc; -fx-background-radius: 5;">
-                                <Label text="Contenido del Mensaje" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
-                                <TextArea fx:id="txtContenidoMensaje" editable="false" wrapText="true" VBox.vgrow="ALWAYS"
-                                         style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 5;"/>
+                            <VBox spacing="10" style="-fx-padding: 15; -fx-background-color: #f7fafc; -fx-background-radius: 5;">
+                                <Label text=" Contenido del Mensaje" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                                <TextArea fx:id="txtContenidoMensaje"
+                                         editable="false"
+                                         wrapText="true"
+                                         VBox.vgrow="ALWAYS"
+                                         promptText="Seleccione un mensaje para ver su contenido..."
+                                         style="-fx-background-color: white; -fx-border-color: #cbd5e0; -fx-border-width: 2; -fx-border-radius: 5; -fx-font-size: 13px;"/>
+                                <Label text=" Tip: Haz clic en un mensaje de la tabla para ver su contenido completo"
+                                      style="-fx-text-fill: #718096; -fx-font-size: 11px; -fx-font-style: italic;"/>
                             </VBox>
                         </SplitPane>
                     </center>
@@ -111,7 +117,7 @@
             </Tab>
 
             <!-- Tab Gestión de Vacaciones -->
-            <Tab text="🏖️ Vacaciones">
+            <Tab text="Vacaciones">
                 <VBox spacing="15.0">
                     <padding>
                         <Insets top="20" right="20" bottom="20" left="20"/>
@@ -124,7 +130,7 @@
                             </font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="🔄 Actualizar" onAction="#handleActualizarVacaciones"/>
+                        <Button text="Actualizar" onAction="#handleActualizarVacaciones"/>
                     </HBox>
 
                     <TableView fx:id="tblSolicitudesVacacion" VBox.vgrow="ALWAYS">
@@ -141,14 +147,17 @@
 
                     <HBox spacing="10.0">
                         <Button fx:id="btnAprobarVacacion" text="✓ Aprobar" onAction="#handleAprobarVacacion"
-                                style="-fx-background-color: #48bb78; -fx-text-fill: white;" prefWidth="120"/>
+                                style="-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold;" prefWidth="120"/>
                         <Button fx:id="btnRechazarVacacion" text="✗ Rechazar" onAction="#handleRechazarVacacion"
-                                style="-fx-background-color: #f56565; -fx-text-fill: white;" prefWidth="120"/>
-                        <Button text="👁️ Ver Detalle" onAction="#handleVerDetalleVacacion" prefWidth="120"/>
+                                style="-fx-background-color: #f56565; -fx-text-fill: white; -fx-font-weight: bold;" prefWidth="120"/>
+                        <Button text="Ver Detalle" onAction="#handleVerDetalleVacacion" prefWidth="120"/>
                     </HBox>
 
                     <VBox spacing="10" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 5;">
-
+                        <Label text="Estados de solicitudes:" style="-fx-font-weight: bold;"/>
+                        <Label text=" PENDIENTE: Requiere tu revisión"/>
+                        <Label text=" APROBADA: Solicitud aceptada"/>
+                        <Label text=" RECHAZADA: Solicitud denegada"/>
                     </VBox>
                 </VBox>
             </Tab>

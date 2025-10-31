@@ -86,23 +86,23 @@ public class SolicitudVacacionService {
         return solicitudRepository.findByEmpleadoOrderByFechaSolicitudDesc(empleado);
     }
 
-    public List<SolicitudVacacion> listarPendientes() {
-        return solicitudRepository.findByEstadoOrderByFechaSolicitudAsc(EstadoSolicitud.PENDIENTE);
-    }
+    //public List<SolicitudVacacion> listarPendientes() {
+      //  return solicitudRepository.findByEstadoOrderByFechaSolicitudAsc(EstadoSolicitud.PENDIENTE);
+    //}
 
     public List<SolicitudVacacion> listarTodas() {
         return solicitudRepository.findAllByOrderByFechaSolicitudDesc();
     }
 
-    public Optional<SolicitudVacacion> buscarPorId(Long id) {
-        return solicitudRepository.findById(id);
-    }
+    //public Optional<SolicitudVacacion> buscarPorId(Long id) {
+      //  return solicitudRepository.findById(id);
+    //}
 
-    public long contarPendientesPorEmpleado(Usuario empleado) {
-        return solicitudRepository.countByEmpleadoAndEstado(empleado, EstadoSolicitud.PENDIENTE);
-    }
+    //public long contarPendientesPorEmpleado(Usuario empleado) {
+      //  return solicitudRepository.countByEmpleadoAndEstado(empleado, EstadoSolicitud.PENDIENTE);
+    //}
 
-    public void eliminar(Long id) {
-        solicitudRepository.deleteById(id);
-    }
+    //public void eliminar(Long id) {
+      //  solicitudRepository.deleteById(id);
+    //}
 }

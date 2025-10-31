@@ -10,7 +10,8 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UsuarioService usuarioService;
 
-    // ✅ CONSTRUCTOR CORREGIDO
+    //aqui el DataInitializer crea un usuario administrador la primera vez para que la BD no este vacia , algo estatico
+
     public DataInitializer(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }

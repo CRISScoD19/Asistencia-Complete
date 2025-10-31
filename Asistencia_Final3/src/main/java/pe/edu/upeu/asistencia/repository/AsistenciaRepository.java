@@ -11,18 +11,13 @@ import java.util.List;
 @Repository
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
-    /**
-     * Busca asistencias por usuario
-     */
+
+    //busca asistencia de usu
     List<Asistencia> findByUsuario(Usuario usuario);
 
-    /**
-     * Busca asistencias por fecha
-     */
+    //por fechaa
     List<Asistencia> findByFecha(LocalDate fecha);
 
-    /**
-     * Busca asistencias por usuario y fecha (para verificar si ya registró hoy)
-     */
-    List<Asistencia> findByUsuarioAndFecha(Usuario usuario, LocalDate fecha);  // ✅ AGREGA ESTE MÉTODO
+    //fech y usua
+    List<Asistencia> findByUsuarioAndFecha(Usuario usuario, LocalDate fecha);
 }

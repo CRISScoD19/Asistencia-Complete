@@ -4,18 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * Clase utilitaria para encriptación de contraseñas usando SHA-256
- * Investigación adicional: SHA-256 es un algoritmo de hash criptográfico
- * que convierte texto en una cadena de 64 caracteres hexadecimales.
- */
+//encripta la contraseña con sha 256
 public class HashUtil {
 
-    /**
-     * Encripta una contraseña usando SHA-256
-     * @param password Contraseña en texto plano
-     * @return Hash SHA-256 en formato hexadecimal
-     */
+
     public static String sha256(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -38,12 +30,6 @@ public class HashUtil {
         }
     }
 
-    /**
-     * Verifica si una contraseña coincide con un hash
-     * @param password Contraseña en texto plano
-     * @param hash Hash almacenado
-     * @return true si coinciden, false en caso contrario
-     */
     public static boolean verificar(String password, String hash) {
         String passwordHash = sha256(password);
         return passwordHash.equals(hash);

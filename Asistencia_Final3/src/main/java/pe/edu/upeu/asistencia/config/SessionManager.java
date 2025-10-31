@@ -3,6 +3,7 @@ package pe.edu.upeu.asistencia.config;  // ✅ CAMBIA ESTO
 import pe.edu.upeu.asistencia.model.Usuario;
 
 public class SessionManager {
+    //Es como memoria temporal de la sesión
 
     private static SessionManager instance;
     private Usuario usuarioActual;
@@ -28,7 +29,7 @@ public class SessionManager {
         usuarioActual = null;
     }
 
-    public boolean hayUsuarioLogueado() {
-        return usuarioActual != null;
-    }
+    //public boolean hayUsuarioLogueado() {
+      //  return usuarioActual != null;
+    //}
 }

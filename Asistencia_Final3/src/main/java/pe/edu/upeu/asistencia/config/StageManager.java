@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StageManager {
+    //Cambia de pantallas la pp Javafxx
 
     private final ConfigurableApplicationContext springContext;
     private Stage primaryStage;
