@@ -32,14 +32,14 @@ public class DataInitializer implements CommandLineRunner {
 
         if (!usuarioService.existeUsername("empleado1")) {
             usuarioService.crearUsuario(
-                    "Juan Pérez López",
+                    "Cristian Ccanahuire Ttito",
                     "empleado1",
                     "123456",
                     Rol.EMPLEADO
             );
             System.out.println("✓ Usuario empleado de prueba creado:");
-            System.out.println("  Username: empleado1");
-            System.out.println("  Password: 123456");
+            System.out.println("   empleado1");
+            System.out.println("   123456");
         }
     }
 }

@@ -20,4 +20,9 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
 
     //fech y usua
     List<Asistencia> findByUsuarioAndFecha(Usuario usuario, LocalDate fecha);
+
+    long countByUsuarioAndEstado(Usuario usuario, String estado);
+
+    List<Asistencia> findByUsuarioAndFechaBetween(Usuario usuario, LocalDate fechaInicio, LocalDate fechaFin);
+
 }

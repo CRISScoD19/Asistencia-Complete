@@ -19,13 +19,36 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     public Optional<Usuario> autenticar(String username, String password) {
+        System.out.println("=== DEBUG AUTENTICAR ===");
+        System.out.println("Username recibido: " + username);
+        System.out.println("Password recibido: " + password);
+
         Optional<Usuario> usuario = usuarioRepository.findByUsername(username);
+        System.out.println("Usuario encontrado en BD: " + usuario.isPresent());
+
         if (usuario.isPresent()) {
-            String passwordHash = HashUtil.sha256(password);
-            if (usuario.get().getPasswordHash().equals(passwordHash) && usuario.get().getActivo()) {
+            Usuario u = usuario.get();
+            System.out.println("Usuario: " + u.getUsername());
+            System.out.println("Activo: " + u.getActivo());
+            System.out.println("Rol: " + u.getRol());
+
+            String passwordHashIngresado = HashUtil.sha256(password);
+            String passwordHashBD = u.getPasswordHash();
+
+            System.out.println("Hash ingresado: " + passwordHashIngresado);
+            System.out.println("Hash en BD: " + passwordHashBD);
+            System.out.println("Hashes coinciden: " + passwordHashIngresado.equals(passwordHashBD));
+
+            if (passwordHashBD.equals(passwordHashIngresado) && u.getActivo()) {
+                System.out.println("✓ Autenticación exitosa");
                 return usuario;
+            } else {
+                System.out.println("✗ Autenticación fallida - password no coincide o usuario inactivo");
             }
+        } else {
+            System.out.println("✗ Usuario no encontrado en la base de datos");
         }
+
         return Optional.empty();
     }
 

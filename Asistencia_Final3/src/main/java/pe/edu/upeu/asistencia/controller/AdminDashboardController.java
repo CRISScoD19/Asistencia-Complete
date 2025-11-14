@@ -1,5 +1,6 @@
 package pe.edu.upeu.asistencia.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
+import pe.edu.upeu.asistencia.dto.ResumenAsistenciaDTO;
 import pe.edu.upeu.asistencia.model.Asistencia;
 import pe.edu.upeu.asistencia.model.Mensaje;
 import pe.edu.upeu.asistencia.model.Usuario;
@@ -23,8 +25,12 @@ import pe.edu.upeu.asistencia.config.StageManager;
 import pe.edu.upeu.asistencia.model.SolicitudVacacion;
 import pe.edu.upeu.asistencia.service.SolicitudVacacionService;
 import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -73,6 +79,22 @@ public class AdminDashboardController {
     @FXML private Button btnAprobarVacacion;
     @FXML private Button btnRechazarVacacion;
 
+    // Dashboard Tab
+    @FXML private ComboBox<String> cboPeriodoDashboard;
+    @FXML private TableView<ResumenAsistenciaDTO> tableDashboardAsistencias;
+    @FXML private TableColumn<ResumenAsistenciaDTO, String> colDashEmpleado;
+    @FXML private TableColumn<ResumenAsistenciaDTO, Long> colDashPresente;
+    @FXML private TableColumn<ResumenAsistenciaDTO, Long> colDashTarde;
+    @FXML private TableColumn<ResumenAsistenciaDTO, Long> colDashAusente;
+    @FXML private TableColumn<ResumenAsistenciaDTO, Long> colDashJustificado;
+    @FXML private TableColumn<ResumenAsistenciaDTO, Long> colDashTotal;
+    @FXML private TableColumn<ResumenAsistenciaDTO, String> colDashPorcentaje;
+    @FXML private Label lblTotalEmpleados;
+    @FXML private Label lblPromedioAsistencia;
+    @FXML private Label lblTotalRegistros;
+
+
+
     @Autowired
     private SolicitudVacacionService solicitudVacacionService;
 
@@ -98,6 +120,7 @@ public class AdminDashboardController {
 
     @FXML
     public void initialize() {
+        configurarTablaDashboard();
         configurarTablaUsuarios();
         configurarTablaAsistencias();
         configurarTablaMensajes();
@@ -107,6 +130,9 @@ public class AdminDashboardController {
         cargarMensajes();
         configurarTablaVacaciones();
         cargarSolicitudesVacaciones();
+
+
+        cargarDashboard();
     }
 
     //CONFIGURACIÓN DE TABLAS
@@ -118,6 +144,142 @@ public class AdminDashboardController {
         colRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
 
         tblUsuarios.setItems(usuarios);
+    }
+    private void configurarTablaDashboard() {
+        colDashEmpleado.setCellValueFactory(new PropertyValueFactory<>("nombreEmpleado"));
+        colDashPresente.setCellValueFactory(new PropertyValueFactory<>("presente"));
+        colDashTarde.setCellValueFactory(new PropertyValueFactory<>("tarde"));
+        colDashAusente.setCellValueFactory(new PropertyValueFactory<>("ausente"));
+        colDashJustificado.setCellValueFactory(new PropertyValueFactory<>("justificado"));
+        colDashTotal.setCellValueFactory(new PropertyValueFactory<>("totalGeneral"));
+        colDashPorcentaje.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getPorcentajeFormateado())
+        );
+
+        // Estilo de alineación opcional
+        colDashPresente.setStyle("-fx-alignment: CENTER;");
+        colDashTarde.setStyle("-fx-alignment: CENTER;");
+        colDashAusente.setStyle("-fx-alignment: CENTER;");
+        colDashJustificado.setStyle("-fx-alignment: CENTER;");
+        colDashTotal.setStyle("-fx-alignment: CENTER;");
+        colDashPorcentaje.setStyle("-fx-alignment: CENTER;");
+
+        // Configurar ComboBox de períodos
+        cboPeriodoDashboard.setItems(FXCollections.observableArrayList(
+                "Todo el tiempo", "Última semana", "Último mes", "Últimos 3 meses"
+        ));
+        cboPeriodoDashboard.setValue("Todo el tiempo");
+    }
+
+    private void cargarDashboard() {
+        List<ResumenAsistenciaDTO> lista = new ArrayList<>();
+
+        String periodoSeleccionado = cboPeriodoDashboard.getValue();
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaInicio = null;
+
+        switch (periodoSeleccionado) {
+            case "Última semana":
+                fechaInicio = hoy.minusWeeks(1);
+                break;
+            case "Último mes":
+                fechaInicio = hoy.minusMonths(1);
+                break;
+            case "Últimos 3 meses":
+                fechaInicio = hoy.minusMonths(3);
+                break;
+            case "Todo el tiempo":
+            default:
+                // Fecha inicio null significa traer todo
+                break;
+        }
+
+        if (fechaInicio != null) {
+            lista = asistenciaService.generarResumenPorPeriodo(fechaInicio, hoy);
+        } else {
+            lista = asistenciaService.generarResumenPorEmpleado();
+        }
+
+        // Calcular total y porcentaje automáticamente
+        lista.forEach(dto -> {
+            long total = dto.getPresente() + dto.getTarde() + dto.getAusente() + dto.getJustificado();
+            dto.setTotalGeneral(total);
+            if (total > 0) {
+                dto.setPorcentajeAsistencia((dto.getPresente() + dto.getJustificado()) * 100.0 / total);
+            } else {
+                dto.setPorcentajeAsistencia(0.0);
+            }
+        });
+
+        // Actualizar TableView
+        tableDashboardAsistencias.setItems(FXCollections.observableArrayList(lista));
+
+        // Actualizar estadísticas generales
+        lblTotalEmpleados.setText(String.valueOf(lista.size()));
+        lblTotalRegistros.setText(String.valueOf(lista.stream().mapToLong(ResumenAsistenciaDTO::getTotalGeneral).sum()));
+        double promedio = lista.stream().mapToDouble(ResumenAsistenciaDTO::getPorcentajeAsistencia).average().orElse(0);
+        lblPromedioAsistencia.setText(String.format("%.2f%%", promedio));
+    }
+
+
+
+    @FXML
+    private void handleFiltrarDashboard() {
+        String periodo = cboPeriodoDashboard.getValue();
+        LocalDate inicio = LocalDate.now();
+
+        switch (periodo) {
+            case "Semana":
+                inicio = LocalDate.now().minusWeeks(1);
+                break;
+            case "Mes":
+                inicio = LocalDate.now().minusMonths(1);
+                break;
+            case "3 Meses":
+                inicio = LocalDate.now().minusMonths(3);
+                break;
+            case "Todo":
+                inicio = LocalDate.of(2000,1,1); // o fecha mínima de tu BD
+                break;
+        }
+
+        List<ResumenAsistenciaDTO> lista = asistenciaService.generarResumenPorPeriodo(inicio, LocalDate.now());
+        tableDashboardAsistencias.setItems(FXCollections.observableArrayList(lista));
+    }
+
+
+    @FXML
+    public void handleActualizarDashboard() {
+        cargarDashboard();
+        mostrarInfo("Dashboard actualizado");
+    }
+    private void mostrarInfo(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Información");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
+    private void actualizarEstadisticasGenerales(List<ResumenAsistenciaDTO> resumen) {
+        int totalEmpleados = resumen.size();
+        lblTotalEmpleados.setText(String.valueOf(totalEmpleados));
+
+        long totalRegistros = resumen.stream()
+                .mapToLong(ResumenAsistenciaDTO::getTotalGeneral)
+                .sum();
+        lblTotalRegistros.setText(String.valueOf(totalRegistros));
+
+        if (totalEmpleados > 0) {
+            double promedioAsistencia = resumen.stream()
+                    .mapToDouble(ResumenAsistenciaDTO::getPorcentajeAsistencia)
+                    .average()
+                    .orElse(0.0);
+            lblPromedioAsistencia.setText(String.format("%.1f%%", promedioAsistencia));
+        } else {
+            lblPromedioAsistencia.setText("0%");
+        }
     }
 
     private void configurarTablaAsistencias() {

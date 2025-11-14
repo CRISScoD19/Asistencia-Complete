@@ -24,7 +24,7 @@ public class StageManager {
     public void cambiarEscena(String fxmlPath, String titulo, int width, int height) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            loader.setControllerFactory(springContext::getBean);
+            loader.setControllerFactory(springContext::getBean); // Spring inyecta el controller
 
             Scene scene = new Scene(loader.load(), width, height);
             scene.getStylesheets().add(getClass().getResource("/static/css/styles.css").toExternalForm());
@@ -37,4 +37,5 @@ public class StageManager {
             throw new RuntimeException("Error al cargar la vista: " + fxmlPath, e);
         }
     }
+
 }

@@ -2,6 +2,7 @@ pe\edu\upeu\asistencia\controller\EmpleadoDashboardController.class
 pe\edu\upeu\asistencia\enums\Rol.class
 pe\edu\upeu\asistencia\service\MensajeService.class
 pe\edu\upeu\asistencia\enums\EstadoAsistencia.class
+pe\edu\upeu\asistencia\dto\ResumenAsistenciaDTO.class
 pe\edu\upeu\asistencia\controller\AdminDashboardController.class
 pe\edu\upeu\asistencia\model\Usuario.class
 pe\edu\upeu\asistencia\config\StageManager.class
