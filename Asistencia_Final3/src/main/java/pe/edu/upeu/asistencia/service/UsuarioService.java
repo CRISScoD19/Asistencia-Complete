@@ -1,5 +1,6 @@
 package pe.edu.upeu.asistencia.service;
 
+import pe.edu.upeu.asistencia.model.Horario;
 import pe.edu.upeu.asistencia.model.Usuario;
 import pe.edu.upeu.asistencia.enums.Rol;
 import pe.edu.upeu.asistencia.repository.UsuarioRepository;
@@ -74,29 +75,27 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    //public Optional<Usuario> buscarPorId(Long id) {
-      //  return usuarioRepository.findById(id);
-    //}
-
-    //public Optional<Usuario> buscarPorUsername(String username) {
-      //  return usuarioRepository.findByUsername(username);
-    //}
-
     public boolean existeUsername(String username) {
         return usuarioRepository.existsByUsername(username);
     }
 
-    //public List<Usuario> listarPorRol(Rol rol) {
-      //  return usuarioRepository.findByRol(rol);
-    //}
-
-    public void crearUsuario(String nombre, String username, String password, Rol rol) {
+    // Crear usuario con horario
+    public void crearUsuario(String nombre, String username, String password, Rol rol, Horario horario) {
         Usuario usuario = new Usuario();
         usuario.setNombre(nombre);
         usuario.setUsername(username);
-        usuario.setPasswordHash(HashUtil.sha256(password)); // Hashear la contraseña
+        usuario.setPasswordHash(HashUtil.sha256(password));
         usuario.setRol(rol);
+        usuario.setHorario(horario);
         usuario.setActivo(true);
+        usuarioRepository.save(usuario);
+    }
+
+    // Asignar horario a usuario
+    public void asignarHorario(Long usuarioId, Horario horario) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setHorario(horario);
         usuarioRepository.save(usuario);
     }
 }

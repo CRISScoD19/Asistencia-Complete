@@ -1,11 +1,14 @@
 package pe.edu.upeu.asistencia.controller;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pe.edu.upeu.asistencia.enums.Rol;
+import pe.edu.upeu.asistencia.model.Horario;
 import pe.edu.upeu.asistencia.model.Usuario;
+import pe.edu.upeu.asistencia.service.HorarioService;
 import pe.edu.upeu.asistencia.service.UsuarioService;
 
 @Component
@@ -15,97 +18,141 @@ public class UsuarioFormController {
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private ComboBox<Rol> cmbRol;
+    @FXML private ComboBox<Horario> cmbHorario;
     @FXML private CheckBox chkActivo;
-    @FXML private Button btnGuardar;
-    @FXML private Button btnCancelar;
+    @FXML private Label lblHorarioInfo;
 
     @Autowired
     private UsuarioService usuarioService;
 
-    private Usuario usuario;
-    private Runnable onGuardar;
+    @Autowired
+    private HorarioService horarioService;
+
+    private Usuario usuarioActual;
+    private Runnable onGuardarCallback;
 
     @FXML
     public void initialize() {
-        cmbRol.getItems().addAll(Rol.values());
-        cmbRol.setValue(Rol.EMPLEADO);
-        chkActivo.setSelected(true);
+        // Configurar ComboBox de Roles
+        cmbRol.setItems(FXCollections.observableArrayList(Rol.values()));
+
+        // Cargar horarios activos
+        cargarHorarios();
+
+        // Listener para mostrar/ocultar horario según el rol
+        cmbRol.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == Rol.EMPLEADO) {
+                cmbHorario.setDisable(false);
+                lblHorarioInfo.setVisible(true);
+            } else {
+                cmbHorario.setDisable(true);
+                cmbHorario.setValue(null);
+                lblHorarioInfo.setVisible(false);
+            }
+        });
+
+        // Mostrar información del horario seleccionado
+        cmbHorario.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                lblHorarioInfo.setText("Horario: " + newVal.getHoraEntrada() + " - " + newVal.getHoraSalida());
+            } else {
+                lblHorarioInfo.setText("");
+            }
+        });
+    }
+
+    private void cargarHorarios() {
+        cmbHorario.setItems(FXCollections.observableArrayList(horarioService.listarActivos()));
     }
 
     public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+        this.usuarioActual = usuario;
         if (usuario != null) {
             txtNombre.setText(usuario.getNombre());
             txtUsername.setText(usuario.getUsername());
-            txtUsername.setDisable(true); // No permitir cambiar username
             cmbRol.setValue(usuario.getRol());
             chkActivo.setSelected(usuario.getActivo());
+            cmbHorario.setValue(usuario.getHorario());
             txtPassword.setPromptText("Dejar vacío para mantener contraseña actual");
+        } else {
+            chkActivo.setSelected(true);
         }
     }
 
     public void setOnGuardar(Runnable callback) {
-        this.onGuardar = callback;
+        this.onGuardarCallback = callback;
     }
 
     @FXML
     private void handleGuardar() {
-        if (!validarCampos()) {
+        // Validaciones
+        if (txtNombre.getText().trim().isEmpty()) {
+            mostrarAlerta("Error", "El nombre es obligatorio", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (txtUsername.getText().trim().isEmpty()) {
+            mostrarAlerta("Error", "El usuario es obligatorio", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (usuarioActual == null && txtPassword.getText().trim().isEmpty()) {
+            mostrarAlerta("Error", "La contraseña es obligatoria para usuarios nuevos", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (cmbRol.getValue() == null) {
+            mostrarAlerta("Error", "Debe seleccionar un rol", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // Validar horario para empleados
+        if (cmbRol.getValue() == Rol.EMPLEADO && cmbHorario.getValue() == null) {
+            mostrarAlerta("Error", "Debe asignar un horario para los empleados", Alert.AlertType.ERROR);
             return;
         }
 
         try {
-            if (usuario == null) {
+            if (usuarioActual == null) {
                 // Nuevo usuario
-                usuario = new Usuario();
-                usuario.setNombre(txtNombre.getText().trim());
-                usuario.setUsername(txtUsername.getText().trim());
-                usuario.setPasswordHash(txtPassword.getText()); // Se encriptará en el servicio
-                usuario.setRol(cmbRol.getValue());
-                usuario.setActivo(chkActivo.isSelected());
+                Usuario nuevoUsuario = new Usuario();
+                nuevoUsuario.setNombre(txtNombre.getText().trim());
+                nuevoUsuario.setUsername(txtUsername.getText().trim());
+                nuevoUsuario.setPasswordHash(txtPassword.getText().trim());
+                nuevoUsuario.setRol(cmbRol.getValue());
+                nuevoUsuario.setActivo(chkActivo.isSelected());
+                nuevoUsuario.setHorario(cmbHorario.getValue());
 
-                usuarioService.guardarUsuario(usuario);
+                usuarioService.guardarUsuario(nuevoUsuario);
+                mostrarAlerta("Éxito", "Usuario creado correctamente", Alert.AlertType.INFORMATION);
             } else {
-                // Editar usuario
-                usuario.setNombre(txtNombre.getText().trim());
-                usuario.setRol(cmbRol.getValue());
-                usuario.setActivo(chkActivo.isSelected());
+                // Actualizar usuario
+                usuarioActual.setNombre(txtNombre.getText().trim());
+                usuarioActual.setUsername(txtUsername.getText().trim());
+                usuarioActual.setRol(cmbRol.getValue());
+                usuarioActual.setActivo(chkActivo.isSelected());
+                usuarioActual.setHorario(cmbHorario.getValue());
 
-                String nuevaPassword = txtPassword.getText();
-                usuarioService.actualizarUsuario(usuario, nuevaPassword.isEmpty() ? null : nuevaPassword);
+                String nuevaPassword = txtPassword.getText().trim();
+                usuarioService.actualizarUsuario(usuarioActual, nuevaPassword);
+                mostrarAlerta("Éxito", "Usuario actualizado correctamente", Alert.AlertType.INFORMATION);
             }
 
-            if (onGuardar != null) {
-                onGuardar.run();
+            if (onGuardarCallback != null) {
+                onGuardarCallback.run();
             }
+
         } catch (Exception e) {
             mostrarAlerta("Error", "No se pudo guardar el usuario: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
     @FXML
     private void handleCancelar() {
-        btnCancelar.getScene().getWindow().hide();
-    }
-
-    private boolean validarCampos() {
-        if (txtNombre.getText().trim().isEmpty()) {
-            mostrarAlerta("Validación", "El nombre es obligatorio", Alert.AlertType.WARNING);
-            return false;
+        if (onGuardarCallback != null) {
+            onGuardarCallback.run();
         }
-        if (txtUsername.getText().trim().isEmpty()) {
-            mostrarAlerta("Validación", "El username es obligatorio", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (usuario == null && txtPassword.getText().isEmpty()) {
-            mostrarAlerta("Validación", "La contraseña es obligatoria para nuevos usuarios", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (cmbRol.getValue() == null) {
-            mostrarAlerta("Validación", "Debe seleccionar un rol", Alert.AlertType.WARNING);
-            return false;
-        }
-        return true;
     }
 
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {

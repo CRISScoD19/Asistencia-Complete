@@ -28,4 +28,8 @@ public class Usuario {
 
     @Column(nullable = false)
     private Boolean activo = true;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "horario_id")
+    private Horario horario;
 }

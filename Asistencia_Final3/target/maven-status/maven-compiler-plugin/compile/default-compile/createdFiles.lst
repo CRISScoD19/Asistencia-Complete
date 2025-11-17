@@ -1,3 +1,5 @@
+pe\edu\upeu\asistencia\service\HorarioService.class
+pe\edu\upeu\asistencia\model\Horario.class
 pe\edu\upeu\asistencia\controller\EmpleadoDashboardController.class
 pe\edu\upeu\asistencia\enums\Rol.class
 pe\edu\upeu\asistencia\service\MensajeService.class
@@ -15,6 +17,7 @@ pe\edu\upeu\asistencia\config\SessionManager.class
 pe\edu\upeu\asistencia\repository\UsuarioRepository.class
 pe\edu\upeu\asistencia\config\DataInitializer.class
 pe\edu\upeu\asistencia\util\HashUtil.class
+pe\edu\upeu\asistencia\repository\HorarioRepository.class
 pe\edu\upeu\asistencia\repository\SolicitudVacacionRepository.class
 pe\edu\upeu\asistencia\service\UsuarioService.class
 pe\edu\upeu\asistencia\repository\AsistenciaRepository.class
