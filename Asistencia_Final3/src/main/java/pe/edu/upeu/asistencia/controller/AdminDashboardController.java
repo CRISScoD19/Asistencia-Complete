@@ -28,15 +28,20 @@ import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class AdminDashboardController {
 
-    // para Usuarios
+    // CAMPOS DE BÚSQUEDA
+    @FXML private TextField txtBuscarUsuario;
+    @FXML private TextField txtBuscarDashboard;
+    @FXML private TextField txtBuscarAsistencia;
+
+    // USUARIOS
     @FXML private TableView<Usuario> tblUsuarios;
     @FXML private TableColumn<Usuario, Long> colId;
     @FXML private TableColumn<Usuario, String> colNombre;
@@ -46,7 +51,7 @@ public class AdminDashboardController {
     @FXML private Button btnEditarUsuario;
     @FXML private Button btnEliminarUsuario;
 
-    // para Asistencias
+    // ASISTENCIAS
     @FXML private TableView<Asistencia> tblAsistencias;
     @FXML private TableColumn<Asistencia, Long> colAsistenciaId;
     @FXML private TableColumn<Asistencia, String> colEmpleado;
@@ -57,7 +62,7 @@ public class AdminDashboardController {
     @FXML private Button btnRegistrarAsistencia;
     @FXML private Button btnEliminarAsistencia;
 
-    // para Mensajes
+    // MENSAJES
     @FXML private TableView<Mensaje> tblMensajes;
     @FXML private TableColumn<Mensaje, String> colMensajeEmisor;
     @FXML private TableColumn<Mensaje, String> colMensajeReceptor;
@@ -67,7 +72,7 @@ public class AdminDashboardController {
     @FXML private Button btnEliminarMensaje;
     @FXML private TextArea txtContenidoMensaje;
 
-    // para Vacaciones
+    // VACACIONES
     @FXML private TableView<SolicitudVacacion> tblSolicitudesVacacion;
     @FXML private TableColumn<SolicitudVacacion, String> colVacEmpleado;
     @FXML private TableColumn<SolicitudVacacion, String> colVacFechaInicio;
@@ -79,7 +84,7 @@ public class AdminDashboardController {
     @FXML private Button btnAprobarVacacion;
     @FXML private Button btnRechazarVacacion;
 
-    // Dashboard Tab
+    // DASHBOARD
     @FXML private ComboBox<String> cboPeriodoDashboard;
     @FXML private TableView<ResumenAsistenciaDTO> tableDashboardAsistencias;
     @FXML private TableColumn<ResumenAsistenciaDTO, String> colDashEmpleado;
@@ -93,30 +98,24 @@ public class AdminDashboardController {
     @FXML private Label lblPromedioAsistencia;
     @FXML private Label lblTotalRegistros;
 
-
-
-    @Autowired
-    private SolicitudVacacionService solicitudVacacionService;
-
-    @Autowired
-    private UsuarioService usuarioService;
-
-    @Autowired
-    private AsistenciaService asistenciaService;
-
-    @Autowired
-    private MensajeService mensajeService;
-
-    @Autowired
-    private ConfigurableApplicationContext springContext;
-
-    @Autowired
-    private StageManager stageManager;
+    @Autowired private SolicitudVacacionService solicitudVacacionService;
+    @Autowired private UsuarioService usuarioService;
+    @Autowired private AsistenciaService asistenciaService;
+    @Autowired private MensajeService mensajeService;
+    @Autowired private ConfigurableApplicationContext springContext;
+    @Autowired private StageManager stageManager;
 
     private ObservableList<Usuario> usuarios = FXCollections.observableArrayList();
+    private ObservableList<Usuario> usuariosFiltrados = FXCollections.observableArrayList();
+
     private ObservableList<Asistencia> asistencias = FXCollections.observableArrayList();
+    private ObservableList<Asistencia> asistenciasFiltradas = FXCollections.observableArrayList();
+
     private ObservableList<Mensaje> mensajes = FXCollections.observableArrayList();
     private ObservableList<SolicitudVacacion> solicitudesVacacion = FXCollections.observableArrayList();
+
+    private ObservableList<ResumenAsistenciaDTO> dashboardData = FXCollections.observableArrayList();
+    private ObservableList<ResumenAsistenciaDTO> dashboardFiltrado = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -124,27 +123,101 @@ public class AdminDashboardController {
         configurarTablaUsuarios();
         configurarTablaAsistencias();
         configurarTablaMensajes();
+        configurarTablaVacaciones();
 
         cargarUsuarios();
         cargarAsistencias();
         cargarMensajes();
-        configurarTablaVacaciones();
         cargarSolicitudesVacaciones();
-
-
         cargarDashboard();
+
+        // Configurar búsqueda en tiempo real
+        configurarBusquedas();
     }
 
-    //CONFIGURACIÓN DE TABLAS
+    // ==================== CONFIGURACIÓN DE BÚSQUEDAS ====================
+
+    private void configurarBusquedas() {
+        // Búsqueda de usuarios
+        if (txtBuscarUsuario != null) {
+            txtBuscarUsuario.textProperty().addListener((observable, oldValue, newValue) -> {
+                buscarUsuarios(newValue);
+            });
+        }
+
+        // Búsqueda en dashboard
+        if (txtBuscarDashboard != null) {
+            txtBuscarDashboard.textProperty().addListener((observable, oldValue, newValue) -> {
+                buscarEnDashboard(newValue);
+            });
+        }
+
+        // Búsqueda en asistencias
+        if (txtBuscarAsistencia != null) {
+            txtBuscarAsistencia.textProperty().addListener((observable, oldValue, newValue) -> {
+                buscarAsistencias(newValue);
+            });
+        }
+    }
+
+    private void buscarUsuarios(String textoBusqueda) {
+        if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+            tblUsuarios.setItems(usuarios);
+        } else {
+            String busqueda = textoBusqueda.toLowerCase().trim();
+            usuariosFiltrados.clear();
+            usuariosFiltrados.addAll(
+                    usuarios.stream()
+                            .filter(u -> u.getNombre().toLowerCase().contains(busqueda) ||
+                                    u.getUsername().toLowerCase().contains(busqueda))
+                            .collect(Collectors.toList())
+            );
+            tblUsuarios.setItems(usuariosFiltrados);
+        }
+    }
+
+    private void buscarEnDashboard(String textoBusqueda) {
+        if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+            tableDashboardAsistencias.setItems(dashboardData);
+            actualizarEstadisticasGenerales(dashboardData);
+        } else {
+            String busqueda = textoBusqueda.toLowerCase().trim();
+            dashboardFiltrado.clear();
+            dashboardFiltrado.addAll(
+                    dashboardData.stream()
+                            .filter(dto -> dto.getNombreEmpleado().toLowerCase().contains(busqueda))
+                            .collect(Collectors.toList())
+            );
+            tableDashboardAsistencias.setItems(dashboardFiltrado);
+            actualizarEstadisticasGenerales(dashboardFiltrado);
+        }
+    }
+
+    private void buscarAsistencias(String textoBusqueda) {
+        if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+            tblAsistencias.setItems(asistencias);
+        } else {
+            String busqueda = textoBusqueda.toLowerCase().trim();
+            asistenciasFiltradas.clear();
+            asistenciasFiltradas.addAll(
+                    asistencias.stream()
+                            .filter(a -> a.getUsuario().getNombre().toLowerCase().contains(busqueda))
+                            .collect(Collectors.toList())
+            );
+            tblAsistencias.setItems(asistenciasFiltradas);
+        }
+    }
+
+    // ==================== CONFIGURACIÓN DE TABLAS ====================
 
     private void configurarTablaUsuarios() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colUsername.setCellValueFactory(new PropertyValueFactory<>("username"));
         colRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
-
         tblUsuarios.setItems(usuarios);
     }
+
     private void configurarTablaDashboard() {
         colDashEmpleado.setCellValueFactory(new PropertyValueFactory<>("nombreEmpleado"));
         colDashPresente.setCellValueFactory(new PropertyValueFactory<>("presente"));
@@ -156,7 +229,6 @@ public class AdminDashboardController {
                 new SimpleStringProperty(cellData.getValue().getPorcentajeFormateado())
         );
 
-        // Estilo de alineación opcional
         colDashPresente.setStyle("-fx-alignment: CENTER;");
         colDashTarde.setStyle("-fx-alignment: CENTER;");
         colDashAusente.setStyle("-fx-alignment: CENTER;");
@@ -164,7 +236,6 @@ public class AdminDashboardController {
         colDashTotal.setStyle("-fx-alignment: CENTER;");
         colDashPorcentaje.setStyle("-fx-alignment: CENTER;");
 
-        // Configurar ComboBox de períodos
         cboPeriodoDashboard.setItems(FXCollections.observableArrayList(
                 "Todo el tiempo", "Última semana", "Último mes", "Últimos 3 meses"
         ));
@@ -173,9 +244,7 @@ public class AdminDashboardController {
 
     private void cargarDashboard() {
         List<ResumenAsistenciaDTO> lista = new ArrayList<>();
-
         String periodoSeleccionado = cboPeriodoDashboard.getValue();
-
         LocalDate hoy = LocalDate.now();
         LocalDate fechaInicio = null;
 
@@ -189,10 +258,6 @@ public class AdminDashboardController {
             case "Últimos 3 meses":
                 fechaInicio = hoy.minusMonths(3);
                 break;
-            case "Todo el tiempo":
-            default:
-                // Fecha inicio null significa traer todo
-                break;
         }
 
         if (fechaInicio != null) {
@@ -201,7 +266,6 @@ public class AdminDashboardController {
             lista = asistenciaService.generarResumenPorEmpleado();
         }
 
-        // Calcular total y porcentaje automáticamente
         lista.forEach(dto -> {
             long total = dto.getPresente() + dto.getTarde() + dto.getAusente() + dto.getJustificado();
             dto.setTotalGeneral(total);
@@ -212,57 +276,24 @@ public class AdminDashboardController {
             }
         });
 
-        // Actualizar TableView
-        tableDashboardAsistencias.setItems(FXCollections.observableArrayList(lista));
-
-        // Actualizar estadísticas generales
-        lblTotalEmpleados.setText(String.valueOf(lista.size()));
-        lblTotalRegistros.setText(String.valueOf(lista.stream().mapToLong(ResumenAsistenciaDTO::getTotalGeneral).sum()));
-        double promedio = lista.stream().mapToDouble(ResumenAsistenciaDTO::getPorcentajeAsistencia).average().orElse(0);
-        lblPromedioAsistencia.setText(String.format("%.2f%%", promedio));
+        dashboardData.clear();
+        dashboardData.addAll(lista);
+        tableDashboardAsistencias.setItems(dashboardData);
+        actualizarEstadisticasGenerales(dashboardData);
     }
-
-
 
     @FXML
     private void handleFiltrarDashboard() {
-        String periodo = cboPeriodoDashboard.getValue();
-        LocalDate inicio = LocalDate.now();
-
-        switch (periodo) {
-            case "Semana":
-                inicio = LocalDate.now().minusWeeks(1);
-                break;
-            case "Mes":
-                inicio = LocalDate.now().minusMonths(1);
-                break;
-            case "3 Meses":
-                inicio = LocalDate.now().minusMonths(3);
-                break;
-            case "Todo":
-                inicio = LocalDate.of(2000,1,1); // o fecha mínima de tu BD
-                break;
-        }
-
-        List<ResumenAsistenciaDTO> lista = asistenciaService.generarResumenPorPeriodo(inicio, LocalDate.now());
-        tableDashboardAsistencias.setItems(FXCollections.observableArrayList(lista));
+        cargarDashboard();
     }
-
 
     @FXML
     public void handleActualizarDashboard() {
         cargarDashboard();
         mostrarInfo("Dashboard actualizado");
     }
-    private void mostrarInfo(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Información");
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
 
-    private void actualizarEstadisticasGenerales(List<ResumenAsistenciaDTO> resumen) {
+    private void actualizarEstadisticasGenerales(ObservableList<ResumenAsistenciaDTO> resumen) {
         int totalEmpleados = resumen.size();
         lblTotalEmpleados.setText(String.valueOf(totalEmpleados));
 
@@ -285,17 +316,15 @@ public class AdminDashboardController {
     private void configurarTablaAsistencias() {
         colAsistenciaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colEmpleado.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getUsuario().getNombre()
-                )
+                new SimpleStringProperty(cellData.getValue().getUsuario().getNombre())
         );
         colFecha.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
+                new SimpleStringProperty(
                         cellData.getValue().getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 )
         );
         colHoraEntrada.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
+                new SimpleStringProperty(
                         cellData.getValue().getHoraEntrada().format(DateTimeFormatter.ofPattern("HH:mm"))
                 )
         );
@@ -303,7 +332,7 @@ public class AdminDashboardController {
             String horaSalida = cellData.getValue().getHoraSalida() != null
                     ? cellData.getValue().getHoraSalida().format(DateTimeFormatter.ofPattern("HH:mm"))
                     : " ";
-            return new javafx.beans.property.SimpleStringProperty(horaSalida);
+            return new SimpleStringProperty(horaSalida);
         });
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
         tblAsistencias.setItems(asistencias);
@@ -311,18 +340,14 @@ public class AdminDashboardController {
 
     private void configurarTablaMensajes() {
         colMensajeEmisor.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getEmisor().getNombre()
-                )
+                new SimpleStringProperty(cellData.getValue().getEmisor().getNombre())
         );
         colMensajeReceptor.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getReceptor().getNombre()
-                )
+                new SimpleStringProperty(cellData.getValue().getReceptor().getNombre())
         );
         colAsunto.setCellValueFactory(new PropertyValueFactory<>("asunto"));
         colFechaEnvio.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
+                new SimpleStringProperty(
                         cellData.getValue().getFechaEnvio().format(
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
                         )
@@ -330,8 +355,6 @@ public class AdminDashboardController {
         );
 
         tblMensajes.setItems(mensajes);
-
-        // Mostrar contenido al seleccionar mensaje
         tblMensajes.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 txtContenidoMensaje.setText(newVal.getContenido());
@@ -339,7 +362,37 @@ public class AdminDashboardController {
         });
     }
 
-    // CARGAR DATOS
+    private void configurarTablaVacaciones() {
+        if (colVacEmpleado != null) {
+            colVacEmpleado.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(cellData.getValue().getEmpleado().getNombre())
+            );
+            colVacFechaInicio.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(
+                            cellData.getValue().getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    )
+            );
+            colVacFechaFin.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(
+                            cellData.getValue().getFechaFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    )
+            );
+            colVacDias.setCellValueFactory(new PropertyValueFactory<>("diasSolicitados"));
+            colVacMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
+            colVacEstado.setCellValueFactory(cellData -> {
+                String estado = cellData.getValue().getEstado().toString();
+                return new SimpleStringProperty(estado);
+            });
+            colVacFechaSolicitud.setCellValueFactory(cellData ->
+                    new SimpleStringProperty(
+                            cellData.getValue().getFechaSolicitud().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                    )
+            );
+            tblSolicitudesVacacion.setItems(solicitudesVacacion);
+        }
+    }
+
+    // ==================== CARGAR DATOS ====================
 
     private void cargarUsuarios() {
         usuarios.clear();
@@ -357,11 +410,15 @@ public class AdminDashboardController {
         mensajes.addAll(mensajeService.obtenerMensajesRecibidos(admin));
     }
 
-    // CRUD USUARIOS
+    private void cargarSolicitudesVacaciones() {
+        solicitudesVacacion.clear();
+        solicitudesVacacion.addAll(solicitudVacacionService.listarTodas());
+    }
+
+    // ==================== CRUD USUARIOS ====================
 
     @FXML
     private void handleNuevoUsuario() {
-
         abrirFormularioUsuario(null);
     }
 
@@ -407,13 +464,14 @@ public class AdminDashboardController {
 
             Stage stage = new Stage();
             stage.setTitle(usuario == null ? "Nuevo Usuario" : "Editar Usuario");
-            stage.setScene(new Scene(loader.load(), 400, 450));
+            stage.setScene(new Scene(loader.load(), 400, 500));
             stage.initModality(Modality.APPLICATION_MODAL);
 
             UsuarioFormController controller = loader.getController();
             controller.setUsuario(usuario);
             controller.setOnGuardar(() -> {
                 cargarUsuarios();
+                cargarDashboard();
                 stage.close();
             });
 
@@ -424,7 +482,7 @@ public class AdminDashboardController {
         }
     }
 
-    // ASISTENCIAS
+    // ==================== ASISTENCIAS ====================
 
     @FXML
     private void handleRegistrarAsistencia() {
@@ -442,6 +500,7 @@ public class AdminDashboardController {
             try {
                 asistenciaService.registrarAsistencia(resultado.get());
                 cargarAsistencias();
+                cargarDashboard();
                 mostrarAlerta("Éxito", "Asistencia registrada correctamente", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
                 mostrarAlerta("Error", e.getMessage(), Alert.AlertType.ERROR);
@@ -465,15 +524,15 @@ public class AdminDashboardController {
         if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
             asistenciaService.eliminarAsistencia(seleccionada.getId());
             cargarAsistencias();
+            cargarDashboard();
             mostrarAlerta("Hecho", "Asistencia eliminada", Alert.AlertType.INFORMATION);
         }
     }
 
-    // MENSAJES
+    // ==================== MENSAJES ====================
 
     @FXML
     private void handleNuevoMensaje() {
-        // Diálogo simple para enviar mensaje
         Dialog<Mensaje> dialog = new Dialog<>();
         dialog.setTitle("Nuevo Mensaje");
         dialog.setHeaderText("Enviar mensaje a empleado");
@@ -481,7 +540,6 @@ public class AdminDashboardController {
         ButtonType btnEnviar = new ButtonType("Enviar", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(btnEnviar, ButtonType.CANCEL);
 
-        // Crear formulario
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -498,7 +556,7 @@ public class AdminDashboardController {
 
         grid.add(new Label("Receptor:"), 0, 0);
         grid.add(cmbReceptor, 1, 0);
-        grid.add(new Label("Asunto:"), 0, 1);//filas y columnas
+        grid.add(new Label("Asunto:"), 0, 1);
         grid.add(txtAsunto, 1, 1);
         grid.add(new Label("Contenido:"), 0, 2);
         grid.add(txtContenido, 1, 2);
@@ -540,66 +598,7 @@ public class AdminDashboardController {
         mostrarAlerta("Éxito", "Mensaje eliminado", Alert.AlertType.INFORMATION);
     }
 
-    @FXML
-    private void handleCerrarSesion() {
-        SessionManager.getInstance().cerrarSesion();
-        stageManager.cambiarEscena("/fxml/login.fxml", "Sistema de Asistencia - Login", 400, 500);
-    }
-
-    private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenido);
-        alert.showAndWait();
-    }
-    // CONFIGURACIÓN TABLA VACACIONES
-
-    private void configurarTablaVacaciones() {
-        if (colVacEmpleado != null) {
-            colVacEmpleado.setCellValueFactory(cellData ->
-                    new javafx.beans.property.SimpleStringProperty(
-                            cellData.getValue().getEmpleado().getNombre()
-                    )
-            );
-            colVacFechaInicio.setCellValueFactory(cellData ->
-                    new javafx.beans.property.SimpleStringProperty(
-                            cellData.getValue().getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                    )
-            );
-            colVacFechaFin.setCellValueFactory(cellData ->
-                    new javafx.beans.property.SimpleStringProperty(
-                            cellData.getValue().getFechaFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                    )
-            );
-            colVacDias.setCellValueFactory(new PropertyValueFactory<>("diasSolicitados"));
-            colVacMotivo.setCellValueFactory(new PropertyValueFactory<>("motivo"));
-            colVacEstado.setCellValueFactory(cellData -> {
-                String estado = cellData.getValue().getEstado().toString();
-                String emoji = "";
-                switch (estado) {
-                    case "PENDIENTE": emoji = "😑 "; break;
-                    case "APROBADA": emoji = "😁"; break;
-                    case "RECHAZADA": emoji = "😢"; break;
-                }
-                return new javafx.beans.property.SimpleStringProperty(emoji + estado);
-            });
-            colVacFechaSolicitud.setCellValueFactory(cellData ->
-                    new javafx.beans.property.SimpleStringProperty(
-                            cellData.getValue().getFechaSolicitud().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                    )
-            );
-
-            tblSolicitudesVacacion.setItems(solicitudesVacacion);
-        }
-    }
-
-    private void cargarSolicitudesVacaciones() {
-        solicitudesVacacion.clear();
-        solicitudesVacacion.addAll(solicitudVacacionService.listarTodas());
-    }
-
-//GESTIÓN DE VACACIONES
+    // ==================== VACACIONES ====================
 
     @FXML
     private void handleAprobarVacacion() {
@@ -704,5 +703,27 @@ public class AdminDashboardController {
     private void handleActualizarVacaciones() {
         cargarSolicitudesVacaciones();
         mostrarAlerta("Éxito", "Lista actualizada", Alert.AlertType.INFORMATION);
+    }
+
+    @FXML
+    private void handleCerrarSesion() {
+        SessionManager.getInstance().cerrarSesion();
+        stageManager.cambiarEscena("/fxml/login.fxml", "Sistema de Asistencia - Login", 400, 500);
+    }
+
+    private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(contenido);
+        alert.showAndWait();
+    }
+
+    private void mostrarInfo(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Información");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

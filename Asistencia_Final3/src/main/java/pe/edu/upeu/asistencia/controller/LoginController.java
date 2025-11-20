@@ -35,8 +35,8 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
-        System.out.println("=== INICIO LOGIN ===");
-        System.out.println("Login clickeado");
+        System.out.println("INICIO LOGIN ");
+        System.out.println("Login click");
 
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText();
@@ -78,7 +78,7 @@ public class LoginController {
             e.printStackTrace();
             mostrarError("Error al intentar iniciar sesión: " + e.getMessage());
         }
-        System.out.println("=== FIN LOGIN ===");
+        System.out.println("FIN LOGIN");
     }
 
     private void mostrarError(String mensaje) {

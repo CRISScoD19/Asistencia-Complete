@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
                     Rol.EMPLEADO,
                     horarioService.listarActivos().get(0) // Asignar primer horario
             );
-            System.out.println("✓ Usuario empleado de prueba creado:");
+            System.out.println(" Usuario empleado de prueba creado:");
             System.out.println("   empleado1");
             System.out.println("   123456");
         }

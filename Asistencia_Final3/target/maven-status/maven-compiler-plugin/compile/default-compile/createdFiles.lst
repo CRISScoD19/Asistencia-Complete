@@ -20,9 +20,11 @@ pe\edu\upeu\asistencia\util\HashUtil.class
 pe\edu\upeu\asistencia\repository\HorarioRepository.class
 pe\edu\upeu\asistencia\repository\SolicitudVacacionRepository.class
 pe\edu\upeu\asistencia\service\UsuarioService.class
+pe\edu\upeu\asistencia\controller\EmpleadoDashboardController$1.class
 pe\edu\upeu\asistencia\repository\AsistenciaRepository.class
 pe\edu\upeu\asistencia\AsistenciaApplication.class
 pe\edu\upeu\asistencia\controller\UsuarioFormController.class
 pe\edu\upeu\asistencia\controller\LoginController.class
 pe\edu\upeu\asistencia\repository\MensajeRepository.class
 pe\edu\upeu\asistencia\model\Mensaje.class
+pe\edu\upeu\asistencia\service\AsistenciaService$1.class

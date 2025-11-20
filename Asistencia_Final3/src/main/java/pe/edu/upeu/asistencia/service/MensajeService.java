@@ -45,12 +45,6 @@ public class MensajeService {
         return mensajeRepository.findByReceptorAndLeidoFalseOrderByFechaEnvioDesc(receptor);
     }
 
-
-    //public long contarMensajesNoLeidos(Usuario receptor) {
-    //    return mensajeRepository.countByReceptorAndLeidoFalse(receptor);
-    //}
-
-
     public void marcarComoLeido(Long mensajeId) {
         Optional<Mensaje> mensaje = mensajeRepository.findById(mensajeId);
 
@@ -83,12 +77,4 @@ public class MensajeService {
     public void eliminar(Long id) {
         mensajeRepository.deleteById(id);
     }
-
-    //public Optional<Mensaje> buscarPorId(Long id) {
-    //    return mensajeRepository.findById(id);
-    //}
-
-    //public List<Mensaje> listarTodos() {
-      //  return mensajeRepository.findAll();
-    //}
 }

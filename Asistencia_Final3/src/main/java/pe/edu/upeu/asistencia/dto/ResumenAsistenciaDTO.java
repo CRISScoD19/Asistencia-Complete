@@ -1,5 +1,9 @@
 package pe.edu.upeu.asistencia.dto;
 
+import lombok.Data;
+
+@Data
+
 public class ResumenAsistenciaDTO {
     private Long empleadoId;
     private String nombreEmpleado;
@@ -36,10 +40,6 @@ public class ResumenAsistenciaDTO {
 
     public void setEmpleadoId(Long empleadoId) {
         this.empleadoId = empleadoId;
-    }
-
-    public String getNombreEmpleado() {
-        return nombreEmpleado;
     }
 
     public void setNombreEmpleado(String nombreEmpleado) {

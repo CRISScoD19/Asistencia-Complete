@@ -1,4 +1,4 @@
-package pe.edu.upeu.asistencia.config;  // ✅ CAMBIA ESTO
+package pe.edu.upeu.asistencia.config;
 
 import pe.edu.upeu.asistencia.model.Usuario;
 
@@ -29,7 +29,4 @@ public class SessionManager {
         usuarioActual = null;
     }
 
-    //public boolean hayUsuarioLogueado() {
-      //  return usuarioActual != null;
-    //}
 }
