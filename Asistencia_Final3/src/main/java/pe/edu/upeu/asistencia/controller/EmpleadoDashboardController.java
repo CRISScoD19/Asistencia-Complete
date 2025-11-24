@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pe.edu.upeu.asistencia.model.Asistencia;
@@ -61,6 +63,7 @@ public class EmpleadoDashboardController {
 
     // Tabla Mis Vacaciones
     @FXML private TableView<Object> tableMisVacaciones;
+    @FXML private TableColumn<Object, String> colVacId;
     @FXML private TableColumn<Object, String> colVacFechaInicio;
     @FXML private TableColumn<Object, String> colVacFechaFin;
     @FXML private TableColumn<Object, String> colVacDias;
@@ -74,6 +77,7 @@ public class EmpleadoDashboardController {
     @FXML private TableColumn<Mensaje, String> colMiMsjFecha;
     @FXML private TableColumn<Mensaje, String> colMiMsjLeido;
     @FXML private TextArea txtMensajeContenido;
+    @FXML private TextField txtIdSolicitud;
 
     // Servicios
     @Autowired private AsistenciaService asistenciaService;
@@ -261,6 +265,11 @@ public class EmpleadoDashboardController {
 
     private void configurarTablaVacacionesEmpleado() {
         if (tableMisVacaciones != null && colVacFechaInicio != null) {
+            colVacId.setCellValueFactory(cellData ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            ((SolicitudVacacion) cellData.getValue()).getId().toString())
+            );
+
             colVacFechaInicio.setCellValueFactory(cellData ->
                     new javafx.beans.property.SimpleStringProperty(
                             ((SolicitudVacacion) cellData.getValue()).getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -506,6 +515,77 @@ public class EmpleadoDashboardController {
     private void handleCerrarSesion() {
         SessionManager.getInstance().cerrarSesion();
         stageManager.cambiarEscena("/fxml/login.fxml", "Sistema de Asistencia - Login", 400, 500);
+    }
+
+    @FXML
+    private void handleGenerarSolicitudVacaciones(){
+        try {
+            String idSolicitudText = txtIdSolicitud.getText();
+
+            // VALIDACIÓN 1: Campo vacío
+            if (idSolicitudText == null || idSolicitudText.trim().isEmpty()) {
+                mostrarAlerta("Error", "El campo ID de solicitud no puede estar vacío", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // VALIDACIÓN 2: Formato numérico
+            long idSolicitud;
+            try {
+                idSolicitud = Long.parseLong(idSolicitudText.trim());
+            } catch (NumberFormatException e) {
+                mostrarAlerta("Error", "El ID de solicitud debe ser un número válido", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // VALIDACIÓN 3: Rango positivo
+            if (idSolicitud <= 0) {
+                mostrarAlerta("Error", "El ID de solicitud debe ser un número positivo", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // VALIDACIÓN 4: Verificar que la solicitud existe (USANDO buscarPorId)
+            Optional<SolicitudVacacion> solicitud = solicitudVacacionService.buscarPorId(idSolicitud);
+            if (solicitud.isEmpty()) {
+                mostrarAlerta("Error", "No se encontró una solicitud con el ID: " + idSolicitud, Alert.AlertType.WARNING);
+                return;
+            }
+
+            // VALIDACIÓN 5: Verificar que la solicitud pertenece al usuario actual
+            if (!solicitud.get().getEmpleado().getId().equals(usuarioActual.getId())) {
+                mostrarAlerta("Error", "La solicitud con ID " + idSolicitud + " no pertenece a tu usuario", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // Generar el reporte si pasó todas las validaciones
+            JasperPrint jasperPrint = solicitudVacacionService.runReportSolicitud(idSolicitud);
+
+            // Guardar como PDF
+            String outputFile = System.getProperty("user.home") + "/Desktop/Solicitud_Vacaciones_" + idSolicitud + ".pdf";
+
+            JasperExportManager.exportReportToPdfFile(jasperPrint, outputFile);
+
+            // Abrir el archivo PDF
+            openPDFFile(outputFile);
+
+            mostrarAlerta("Éxito", "Reporte generado en: " + outputFile, Alert.AlertType.INFORMATION);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo generar el reporte: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void openPDFFile(String filePath) {
+        try {
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(new java.io.File(filePath));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("No se pudo abrir el PDF automáticamente: " + e.getMessage());
+        }
     }
 
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {

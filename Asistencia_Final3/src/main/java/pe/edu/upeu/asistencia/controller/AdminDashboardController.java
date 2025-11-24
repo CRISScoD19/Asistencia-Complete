@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JasperExportManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,8 @@ import pe.edu.upeu.asistencia.model.SolicitudVacacion;
 import pe.edu.upeu.asistencia.service.SolicitudVacacionService;
 import pe.edu.upeu.asistencia.enums.EstadoSolicitud;
 
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -709,6 +712,40 @@ public class AdminDashboardController {
     private void handleCerrarSesion() {
         SessionManager.getInstance().cerrarSesion();
         stageManager.cambiarEscena("/fxml/login.fxml", "Sistema de Asistencia - Login", 400, 500);
+    }
+
+    @FXML
+    private void handleGenerarReporteVacaciones() {
+        try {
+            JasperPrint jasperPrint = solicitudVacacionService.runReport();
+
+            // Guardar como PDF
+            String outputFile = System.getProperty("user.home") + "/Desktop/Reporte_Vacaciones.pdf";
+
+            JasperExportManager.exportReportToPdfFile(jasperPrint, outputFile);
+
+            // Abrir el archivo PDF
+            openPDFFile(outputFile);
+
+            mostrarAlerta("Éxito", "Reporte generado en: " + outputFile, Alert.AlertType.INFORMATION);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo generar el reporte: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void openPDFFile(String filePath) {
+        try {
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(new java.io.File(filePath));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("No se pudo abrir el PDF automáticamente: " + e.getMessage());
+        }
     }
 
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
