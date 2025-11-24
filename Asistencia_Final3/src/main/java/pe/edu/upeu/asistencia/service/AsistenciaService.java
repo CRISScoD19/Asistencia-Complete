@@ -246,7 +246,6 @@ public class AsistenciaService {
         }
     }
 
-    // Método para obtener archivos desde resources
     private File getFile(String filename) throws IOException {
         Resource resource = new ClassPathResource(filename);
         return resource.getFile();
